@@ -17,7 +17,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         children: <Widget>[
           Container(
             decoration: const BoxDecoration(
-              // color: Color(0xFF339966),
               gradient: LinearGradient(
                 colors: [
                   Color(0xFF2c4b7d),
@@ -41,7 +40,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-//                      margin: EdgeInsets.fromLTRB(26.0, 138.0, 27.0, 188.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
@@ -67,7 +65,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         height: 10,
                       ),
                       Container(
-                        // padding: EdgeInsets.fromLTRB( 109.0, 130.5, 109.0, 283.5),
                         width: 140.0,
                         height: 3.0,
                         decoration: const BoxDecoration(
@@ -135,7 +132,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         child: const InkWell(
                           child: Text(
                             "Already have an account? Click here to login",
-                            //textAlign: TextAlign.left,
                             style: TextStyle(
                               color: Color(0xFFFC1B5B),
                               fontSize: 20.0,
@@ -166,7 +162,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                   ),
                 ),
-                // color: Color.fromRGBO(19, 75, 151, 1),
                 onPressed: () {},
               ),
             ],
