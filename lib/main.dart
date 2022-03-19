@@ -10,8 +10,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: RegistrationScreen(),
+    return MaterialApp(
+        initialRoute: '/login',
+        routes: {
+          '/login': (ctx) => const LoginScreen(),
+          '/register' : (ctx) => const RegistrationScreen(),
+        }
     );
   }
 }
