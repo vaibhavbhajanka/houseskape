@@ -129,8 +129,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       Container(
                         padding:
                             const EdgeInsets.fromLTRB(20.0, 20.0, 10.0, 0.0),
-                        child: const InkWell(
-                          child: Text(
+                        child:  InkWell(
+                          child: const Text(
                             "Already have an account? Click here to login",
                             style: TextStyle(
                               color: Color(0xFFFC1B5B),
@@ -138,6 +138,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                            const LoginScreen()));
+                          },
                         ),
                       ),
                       const Padding(
@@ -162,7 +166,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+
+                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                    const RegistrationScreen()));
+                  },
+                },
               ),
             ],
           ),
