@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:houseskape/login_screen.dart';
+import './fill_details_screen.dart';
+import './login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -12,6 +13,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -129,7 +131,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       Container(
                         padding:
                             const EdgeInsets.fromLTRB(20.0, 20.0, 10.0, 0.0),
-                        child:  InkWell(
+                        child: InkWell(
                           child: const Text(
                             "Already have an account? Click here to login",
                             style: TextStyle(
@@ -139,8 +141,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             ),
                           ),
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                            const LoginScreen()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        const LoginScreen()));
                           },
                         ),
                       ),
@@ -167,10 +172,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                 ),
                 onPressed: () {
-
-                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                    const RegistrationScreen()));
-                  },
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              const FillDetailsScreen()));
                 },
               ),
             ],
