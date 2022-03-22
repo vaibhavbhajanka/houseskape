@@ -12,6 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -129,20 +130,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         padding:
                             const EdgeInsets.fromLTRB(20.0, 20.0, 10.0, 0.0),
-                        child:  InkWell(
+                        child: InkWell(
                           child: const Text(
                             "Don't have an account? Click here to register",
                             style: TextStyle(
                               color: Color(0xFFFC1B5B),
                               fontSize: 20.0,
                               fontWeight: FontWeight.w500,
-
                             ),
                           ),
-                            onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                            const RegistrationScreen()));
-                            },
+                          onTap: () {
+                            Navigator.pushNamed(context, '/register');
+                          },
                         ),
                       ),
                       const Padding(
