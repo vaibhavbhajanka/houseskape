@@ -40,8 +40,8 @@ class MyApp extends StatelessWidget {
                 color: Colors.black),
           ),
         ),
+        initialRoute: '/login',
         routes: {
-          '/': (ctx) => const SplashScreen1(),
           '/login': (ctx) => const LoginScreen(),
           '/register': (ctx) => const RegistrationScreen(),
         });
