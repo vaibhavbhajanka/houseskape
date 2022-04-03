@@ -130,7 +130,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                           ),
                         ),
                         cursorColor: Colors.black,
-                        keyboardType: TextInputType.numberWithOptions(),
+                        keyboardType: const TextInputType.numberWithOptions(),
                       ),
                     ),
                     Padding(
