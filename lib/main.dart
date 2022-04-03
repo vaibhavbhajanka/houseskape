@@ -1,9 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:houseskape/home_screen.dart';
 import 'package:houseskape/registration_screen.dart';
 import 'package:houseskape/login_screen.dart';
-import './splash_screen.dart';
 
-void main() {
+Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -14,11 +17,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-          // Define the default brightness and colors.
-          //brightness: Brightness.dark,
-          //primaryColor: Colors.lightBlue[800],
-
-          // Define the default font family.
           fontFamily: 'DM_Sans',
 
           textTheme: const TextTheme(
@@ -44,6 +42,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (ctx) => const LoginScreen(),
           '/register': (ctx) => const RegistrationScreen(),
+          '/home': (ctx) => const HomeScreen(),
         });
   }
 }
