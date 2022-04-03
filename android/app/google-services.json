@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "764721253593",
+    "project_id": "houseskape",
+    "storage_bucket": "houseskape.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:764721253593:android:e903ab2cbc1f08289902c8",
+        "android_client_info": {
+          "package_name": "com.example.houseskape"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "764721253593-tmusaqtq1d9r5hfq5480pd6jjl1c5duu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.houseskape",
+            "certificate_hash": "7b62343d2704973f1f1fc1cc42bd1eae47e1b974"
+          }
+        },
+        {
+          "client_id": "764721253593-m9f8q56liq2hukhhgr7avtslnkmu964j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5iyDHJRDZ4dlg2TUZU6OOIWj-7J6f-EM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "764721253593-m9f8q56liq2hukhhgr7avtslnkmu964j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
