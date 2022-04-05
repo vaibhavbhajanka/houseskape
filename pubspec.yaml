@@ -81,6 +81,9 @@ flutter:
       fonts:
         - asset: assets/fonts/DM_Sans/DMSans-Regular.ttf
         - asset: assets/fonts/DM_Sans/DMSans-Medium.ttf
+    - family: HomeIcons
+      fonts:
+        - asset: assets/fonts/HomeIcons.ttf
   #        style: italic
   #   - family: Trajan Pro
   #     fonts:
