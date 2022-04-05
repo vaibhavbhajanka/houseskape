@@ -360,6 +360,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         .doc(user.uid)
         .set(userModel.toMap());
     Fluttertoast.showToast(msg: "Account created successfully :) ");
-    Navigator.restorablePushNamedAndRemoveUntil(context, '/home', (route) => false);
+    Navigator.restorablePushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
   }
 }
