@@ -1,8 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:houseskape/chat_screen.dart';
+import 'package:houseskape/dashboard_screen.dart';
 import 'package:houseskape/home_screen.dart';
+import 'package:houseskape/profile_screen.dart';
 import 'package:houseskape/registration_screen.dart';
 import 'package:houseskape/login_screen.dart';
+import 'package:houseskape/saved_screen.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +22,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         theme: ThemeData(
           fontFamily: 'DM_Sans',
-
+          scaffoldBackgroundColor: const Color(0xfffcf9f4),
+          // primaryColor: const Color(0xff1b3359),
           textTheme: const TextTheme(
             headline1: TextStyle(
                 fontSize: 30.0,
@@ -42,7 +47,11 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (ctx) => const LoginScreen(),
           '/register': (ctx) => const RegistrationScreen(),
+          '/dashboard':(ctx) => const DashboardScreen(),
           '/home': (ctx) => const HomeScreen(),
+          '/saved':(ctx) => const SavedScreen(),
+          '/chat': (ctx) => const ChatScreen(),
+          '/profile': (ctx) => const ProfileScreen()
         });
   }
 }
