@@ -1,10 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:houseskape/chat_screen.dart';
 import 'package:houseskape/home_icons.dart';
 import 'package:houseskape/home_screen.dart';
-import 'package:houseskape/model/user_model.dart';
 import 'package:houseskape/profile_screen.dart';
 import 'package:houseskape/saved_screen.dart';
 
@@ -16,22 +13,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  User? user = FirebaseAuth.instance.currentUser;
-
-  UserModel loggedInUser = UserModel();
-
-  @override
-  void initState() {
-    super.initState();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-      setState(() {});
-    });
-  }
 
   int currentTab = 0;
 
@@ -204,10 +185,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.restorablePushReplacementNamed(context, '/login');
   }
 }

@@ -13,7 +13,7 @@ class _SavedScreenState extends State<SavedScreen> {
   Widget build(BuildContext context) {
     return const Scaffold(
       appBar:  CustomAppBar(
-        actions: Icons.search,
+        widget: Icon(Icons.search),
         title: 'Saved',
       ),
       body: Center(

@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:houseskape/home_icons.dart';
+import 'package:houseskape/model/user_model.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -10,11 +13,43 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  UserModel loggedInUser = UserModel();
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      loggedInUser = UserModel.fromMap(value.data());
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        actions: Icons.more_vert,
+      appBar: CustomAppBar(
+        widget: PopupMenuButton(
+          icon: const Icon(
+            Icons.more_vert,
+            color: Color(0xff25262b),
+          ),
+          onSelected: (value) => selectedItem(context, value),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 0,
+              child: ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('Logout'),
+              ),
+            ),
+          ],
+        ),
         title: 'Account',
         elevation: 0,
       ),
@@ -40,23 +75,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 flex: 5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Hannah',
-                      style: TextStyle(
+                      "${loggedInUser.name}",
+                      style: const TextStyle(
                         color: Color(0xff25262b),
                         fontWeight: FontWeight.w500,
                         fontSize: 35,
                       ),
                     ),
-                    Text(
-                      'Turing',
-                      style: TextStyle(
-                        color: Color(0xff25262b),
-                        fontWeight: FontWeight.w500,
-                        fontSize: 35,
-                      ),
-                    ),
+                    // Text(
+                    //   'Turing',
+                    //   style: TextStyle(
+                    //     color: Color(0xff25262b),
+                    //     fontWeight: FontWeight.w500,
+                    //     fontSize: 35,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -107,33 +142,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-          const ReusableListTile(icon: HomeIcons.profile_outline,title: 'Profile',),
+          const ReusableListTile(
+            icon: HomeIcons.profile_outline,
+            title: 'Profile',
+          ),
           const Divider(
             indent: 100,
             endIndent: 30,
             thickness: 1,
           ),
-          const ReusableListTile(icon: Icons.notifications,title: 'Notifications',),
+          const ReusableListTile(
+            icon: Icons.notifications,
+            title: 'Notifications',
+          ),
           const Divider(
             indent: 100,
             endIndent: 30,
             thickness: 1,
           ),
-          const ReusableListTile(icon: Icons.info_outline_rounded,title: 'About Us',),
+          const ReusableListTile(
+            icon: Icons.info_outline_rounded,
+            title: 'About Us',
+          ),
           const Divider(
             indent: 100,
             endIndent: 30,
             thickness: 1,
           ),
-          const ReusableListTile(icon: HomeIcons.lock,title: 'Privacy',),
+          const ReusableListTile(
+            icon: HomeIcons.lock,
+            title: 'Privacy',
+          ),
         ],
       ),
     );
   }
+
+  Future<void> logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.restorablePushReplacementNamed(context, '/login');
+  }
+
+  void selectedItem(BuildContext context, value) {
+    switch (value) {
+      case 0:
+        logout(context);
+        break;
+    }
+  }
 }
 
 class ReusableListTile extends StatelessWidget {
-
   final IconData icon;
   final String title;
 
