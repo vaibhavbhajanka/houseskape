@@ -13,10 +13,13 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        actions: Icons.search,
+        widget: Icon(Icons.search),
         leading: Icons.arrow_back_ios_new_rounded,
         title: 'Message',
         // elevation: ,
+        // onPressed: (){
+          
+        // },
       ),
       body: ListView(
         children: [
