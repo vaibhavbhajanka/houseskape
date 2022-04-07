@@ -15,8 +15,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return const Scaffold(
       appBar:  CustomAppBar(
         leading: HomeIcons.menu,
-        actions: Icons.search,
+        // actions: Icons.search,
+        widget: Icon(Icons.search),
         elevation: 0,
+        // onPressed: (){},
       ),
       body: Center(
         child: Text('Home'),
