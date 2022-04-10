@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:houseskape/home_icons.dart';
 import 'package:houseskape/model/user_model.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
@@ -13,6 +14,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final auth = FirebaseAuth.instance;
+  final googleSignIn = GoogleSignIn();
   User? user = FirebaseAuth.instance.currentUser;
 
   UserModel loggedInUser = UserModel();
@@ -28,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       loggedInUser = UserModel.fromMap(value.data());
       setState(() {});
     });
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -58,14 +61,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const Expanded(
+               const Expanded(
                 flex: 3,
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     backgroundColor: Colors.transparent,
                     radius: 50,
-                    backgroundImage: AssetImage(
+                    backgroundImage:
+                    // NetworkImage("${user?.photoURL}"),
+                    AssetImage(
                       "assets/images/dp.jpg",
                     ),
                   ),
@@ -78,6 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Text(
                       "${loggedInUser.name}",
+                      // "${user?.displayName}",
                       style: const TextStyle(
                         color: Color(0xff25262b),
                         fontWeight: FontWeight.w500,
@@ -179,6 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> logout(BuildContext context) async {
+    await googleSignIn.signOut();
     await FirebaseAuth.instance.signOut();
     Navigator.restorablePushReplacementNamed(context, '/login');
   }
