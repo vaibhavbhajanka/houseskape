@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:houseskape/model/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -225,16 +228,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.white,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Card(
-                  child: ListTile(
-                    leading: Image.asset('assets/images/google.png'),
-                    title: const Text(
-                      'Sign in with Google',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: (){
+                  signInwithGoogle();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  child: Card(
+                    child: ListTile(
+                      leading: Image.asset('assets/images/google.png'),
+                      title: const Text(
+                        'Sign in with Google',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -284,5 +292,47 @@ class _LoginScreenState extends State<LoginScreen> {
         // print(error.code);
       }
     }
+  }
+
+  Future<void> signInwithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser!.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await _auth.signInWithCredential(credential).then(
+            (value) => {
+              postDetailsToFirestore()
+            },
+          );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+      // throw e;
+    }
+  }
+  postDetailsToFirestore() async {//implemented for google sign-in
+    // calling our firestore
+    // calling our user model
+    // sending these values
+
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User? user = _auth.currentUser;
+
+    UserModel userModel = UserModel();
+
+    // writing all the values
+    userModel.email = user!.email;
+    userModel.uid = user.uid;
+    userModel.name = user.displayName;
+
+    await firebaseFirestore
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Login Successful");
+    Navigator.restorablePushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
   }
 }
