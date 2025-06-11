@@ -220,6 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 onPressed: () {
                   signIn(emailController.text, passwordController.text);
+                  // Navigator.pushReplacementNamed(context, '/dashboard');
                 },
               ),
               const Text(
@@ -305,11 +306,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       await _auth.signInWithCredential(credential).then(
             (value) => {
-              postDetailsToFirestore()
+              Navigator.restorablePushNamedAndRemoveUntil(context, '/dashboard', (route) => false),
+              // postDetailsToFirestore()
             },
           );
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      Fluttertoast.showToast(msg: e.message.toString());
       // throw e;
     }
   }
