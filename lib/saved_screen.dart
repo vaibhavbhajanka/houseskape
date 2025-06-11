@@ -11,13 +11,16 @@ class SavedScreen extends StatefulWidget {
 class _SavedScreenState extends State<SavedScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar:  CustomAppBar(
-        widget: Icon(Icons.search),
+        widget: const Icon(Icons.search),
         title: 'Saved',
+        onPressed: (){},
       ),
-      body: Center(
-        child: Text('Saved'),
+      body: const SingleChildScrollView(
+        child: Center(
+          child: Text('Saved'),
+        ),
       ),
     );
   }

@@ -6,7 +6,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   // final IconData actions;
   final double elevation;
   final Widget widget;
-  // final VoidCallback onPressed;
+  final VoidCallback onPressed;
 
   const CustomAppBar({
     Key? key,
@@ -14,7 +14,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.elevation = 4,
     this.leading = Icons.arrow_back_ios_new_rounded,
     required this.widget,
-    // required this.onPressed,
+    required this.onPressed,
     // required this.actions,
   }) : super(key: key);
   @override
@@ -29,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           leading,
           color: const Color(0xff25262b),
         ),
-        onPressed: () {},
+        onPressed: onPressed,
       ),
       title: Text(
         title,
