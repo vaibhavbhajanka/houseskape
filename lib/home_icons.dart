@@ -29,8 +29,8 @@ class HomeIcons {
   static const IconData bed = IconData(0xe808, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData bathtub = IconData(0xe809, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData area = IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData profile_outline = IconData(0xe80c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData navigate_outline = IconData(0xe80e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData profileOutline = IconData(0xe80c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData navigateOutline = IconData(0xe80e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData menu = IconData(0xe80f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData lock = IconData(0xe810, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

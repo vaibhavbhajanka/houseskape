@@ -4,6 +4,7 @@ import 'package:houseskape/home_icons.dart';
 import 'package:houseskape/home_screen.dart';
 import 'package:houseskape/profile_screen.dart';
 import 'package:houseskape/saved_screen.dart';
+import 'package:houseskape/step1_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -90,7 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const Step1Screen(),),);
+        },
         shape: const CircleBorder(
           side: BorderSide(
             color: Colors.white,
@@ -98,7 +101,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         backgroundColor: const Color(0xff1b3359),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white,),
       ),
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xfffcf9f4),

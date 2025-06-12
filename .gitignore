@@ -44,3 +44,19 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Platform-specific Firebase config files
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# iOS CocoaPods dependencies
+ios/Pods/
+
+# iOS ephemeral/generated files
+ios/Flutter/ephemeral/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/AppFrameworkInfo.plist
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
+ios/Flutter/Profile.xcconfig
+ios/Flutter/flutter_export_environment.sh

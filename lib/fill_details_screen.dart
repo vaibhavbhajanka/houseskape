@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:houseskape/text_theme_extensions.dart';
 
 class FillDetailsScreen extends StatefulWidget {
   const FillDetailsScreen({Key? key}) : super(key: key);
@@ -40,7 +41,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                   Text(
                     'Fill in your Details',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headline1,
+                    style: Theme.of(context).textTheme.displayLarge,
                   ),
                   const SizedBox(
                     width: 20,
@@ -49,12 +50,12 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                   Text(
                     'Seems you are new here',
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   Text(
                     "Let's set up your profile",
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyText1,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
               ),
@@ -72,7 +73,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: TextField(
                         decoration: InputDecoration(
-                          labelStyle: Theme.of(context).textTheme.bodyText2,
+                          labelStyle: Theme.of(context).textTheme.bodyMedium,
                           labelText: ' Full Name',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           enabledBorder: OutlineInputBorder(
@@ -93,7 +94,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: TextField(
                         decoration: InputDecoration(
-                          labelStyle: Theme.of(context).textTheme.bodyText2,
+                          labelStyle: Theme.of(context).textTheme.bodyMedium,
                           labelText: ' Gender',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           enabledBorder: OutlineInputBorder(
@@ -115,7 +116,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: TextField(
                         decoration: InputDecoration(
-                          labelStyle: Theme.of(context).textTheme.bodyText2,
+                          labelStyle: Theme.of(context).textTheme.bodyMedium,
                           labelText: ' Mobile Number',
                           floatingLabelBehavior: FloatingLabelBehavior.always,
                           enabledBorder: OutlineInputBorder(
@@ -138,7 +139,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
                       child: DateTimePicker(
                         decoration: InputDecoration(
                           labelText: " Date",
-                          labelStyle: Theme.of(context).textTheme.bodyText2,
+                          labelStyle: Theme.of(context).textTheme.bodyMedium,
                           contentPadding: const EdgeInsets.only(left: 20),
                           suffixIcon: const Icon(
                             Icons.event,
@@ -187,7 +188,7 @@ class _FillDetailsScreenState extends State<FillDetailsScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: const Color(0xFF1B3359),
+                backgroundColor: const Color(0xFF1B3359),
               ),
               child: const Padding(
                 padding:
