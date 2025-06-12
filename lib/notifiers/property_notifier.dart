@@ -37,6 +37,14 @@ class PropertyNotifier with ChangeNotifier {
     _allPropertyList.insert(0, property);
     notifyListeners();
   }
+
+  updateProperty(Property property) {
+    final index = _propertyList.indexWhere((p) => p.id == property.id);
+    if (index != -1) {
+      _propertyList[index] = property;
+      notifyListeners();
+    }
+  }
   // deleteProperty(Property Property) {
   //   _PropertyList.removeWhere((_Property) => _Property.id == Property.id);
   //   notifyListeners();

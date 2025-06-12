@@ -106,57 +106,32 @@ getChats(String chatRoomId) async{
         .where('users', arrayContains: itIsMyName)
         .snapshots();
   }
+
 getProperties(PropertyNotifier propertyNotifier) async {
   User? user = FirebaseAuth.instance.currentUser;
-  QuerySnapshot snapshot = await FirebaseFirestore.instance
-      .collection('listings')
-      .doc(user!.uid)
+  if (user == null) return;
+  QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
       .collection('properties')
-      // .orderBy("date", descending: true)
+      .where('ownerId', isEqualTo: user.uid)
       .get();
-
   List<Property> _propertyList = [];
-
   for (var document in snapshot.docs) {
-    // print(document.data())
-    Property property = Property.fromMap(document.data());
+    Property property = Property.fromMap(document.data(), id: document.id);
     _propertyList.add(property);
   }
-
   propertyNotifier.propertyList = _propertyList;
 }
 
 getAllProperties(PropertyNotifier propertyNotifier, String location) async {
-  // User? user = FirebaseAuth.instance.currentUser;
-  List userList = await FirebaseFirestore.instance
-      .collection("users")
-      .get()
-      .then((val) =>val.docs );
-    // print(list_of_users);
-    // for(var document in list_of_users){
-    //   print(document.id);
-    // }
-
-  // print('Users:${list_of_users}');
+  QuerySnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+      .collection('properties')
+      .where('location', isEqualTo: location)
+      .get();
 
   List<Property> _allPropertyList = [];
-
-  for (int i = 0; i < userList.length; i++) {
-  //   // FirebaseFirestore.instance.collection("masters").doc(
-  //   //      list_of_users[i].documentID.toString()).collection("courses").snapshots().listen(CreateListofCourses);
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('listings')
-        .doc(userList[i].id.toString())
-        .collection('properties')
-        .where("location",isEqualTo: location)
-        // .orderBy("date", descending: true)
-        .get();
-
-    for (var document in snapshot.docs) {
-      // print(document.data())
-      Property property = Property.fromMap(document.data());
-      _allPropertyList.add(property);
-    }
+  for (var document in snapshot.docs) {
+    Property property = Property.fromMap(document.data());
+    _allPropertyList.add(property);
   }
   propertyNotifier.allPropertyList = _allPropertyList;
 }

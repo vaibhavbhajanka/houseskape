@@ -13,7 +13,7 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  Stream<QuerySnapshot>? chats;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? chats;
   TextEditingController messageEditingController = TextEditingController();
 
   User? user = FirebaseAuth.instance.currentUser;
@@ -40,7 +40,7 @@ class _ChatState extends State<Chat> {
   Widget chatMessages(){
     return StreamBuilder(
       stream: chats,
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
+      builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot){
         return snapshot.hasData ?  ListView.builder(
           itemCount: snapshot.data?.docs.length,
             itemBuilder: (context, index){
@@ -104,7 +104,7 @@ class _ChatState extends State<Chat> {
                         controller: messageEditingController,
                         // style: simpleTextStyle(),
                         decoration: InputDecoration(
-                          labelStyle: Theme.of(context).textTheme.bodyText2,
+                          labelStyle: Theme.of(context).textTheme.bodyMedium,
                           // labelText: ' Street Address ',
                           hintText: 'Message...',
                           floatingLabelBehavior:

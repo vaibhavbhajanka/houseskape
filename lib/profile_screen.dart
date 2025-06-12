@@ -7,7 +7,7 @@ import 'package:houseskape/model/user_model.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                 const Expanded(
+                 Expanded(
                   flex: 3,
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
@@ -74,10 +74,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundColor: Colors.transparent,
                       radius: 50,
                       backgroundImage:
-                      // NetworkImage("${user?.photoURL}"),
-                      AssetImage(
-                        "assets/images/dp.jpg",
-                      ),
+                      NetworkImage("${loggedInUser.profileImage}"),
+                      // AssetImage(
+                      //   "assets/images/dp.jpg",
+                      // ),
                     ),
                   ),
                 ),
@@ -116,7 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF1b3359),
+                        backgroundColor: const Color(0xFF1b3359),
                       ),
                       child: const Text(
                         'Settings',
@@ -136,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF1b3359),
+                        backgroundColor: const Color(0xFF1b3359),
                       ),
                       child: const Text(
                         'Listings',
@@ -211,10 +211,10 @@ class ReusableListTile extends StatelessWidget {
   final String title;
 
   const ReusableListTile({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -226,12 +226,12 @@ class ReusableListTile extends StatelessWidget {
             flex: 1,
             child: CircleAvatar(
               radius: 35,
+              backgroundColor: const Color(0xffefefef),
               child: Icon(
                 icon,
                 color: const Color(0xff25262b),
                 size: 35,
               ),
-              backgroundColor: const Color(0xffefefef),
             ),
           ),
           Expanded(

@@ -5,6 +5,9 @@ import 'package:houseskape/home_icons.dart';
 import 'package:houseskape/notifiers/property_notifier.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:houseskape/model/property_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 // import 'package:yandex_mapkit/yandex_mapkit.dart';
 
 bool bookmarked = false;
@@ -18,9 +21,21 @@ class PropertyDetailsScreen extends StatefulWidget {
 }
 
 class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
+  Property? propertyArg;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is Property) {
+      propertyArg = args;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     PropertyNotifier propertyNotifier = Provider.of<PropertyNotifier>(context);
+    final property = propertyArg ?? propertyNotifier.currentProperty;
     return Scaffold(
       // backgroundColor: Colors.white,
       appBar: CustomAppBar(
@@ -86,7 +101,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
               children: [
                 const Icon(Icons.currency_rupee),
                 Text(
-                  "${propertyNotifier.currentProperty.monthlyRent}/month",
+                  "${property.monthlyRent}/month",
                   style: const TextStyle(fontSize: 20),
                 ),
               ],
@@ -103,14 +118,29 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  "assets/images/house2.png",
-                  width: 200,
-                ),
+                child: property.image != null && property.image!.startsWith('http')
+                    ? CachedNetworkImage(
+                        imageUrl: property.image!,
+                        width: 200,
+                        placeholder: (context, url) => Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 200,
+                            height: 120,
+                            color: Colors.white,
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => const Icon(Icons.image_not_supported, size: 100),
+                      )
+                    : Image.asset(
+                        "assets/images/house2.png",
+                        width: 200,
+                      ),
               ),
               const SizedBox(height: 15),
                Text(
-                propertyNotifier.currentProperty.adTitle.toString(),
+                property.adTitle.toString(),
                 style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -127,7 +157,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           size: 17,
                           color: const Color(0xff25262B).withOpacity(0.7)),
                       const SizedBox(width: 10),
-                      Text("${propertyNotifier.currentProperty.bedrooms} bedrooms",
+                      Text("${property.bedrooms} bedrooms",
                           style: TextStyle(
                               fontSize: 14,
                               color: const Color(0xff25262B).withOpacity(0.7)))
@@ -140,7 +170,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           size: 17,
                           color: const Color(0xff25262B).withOpacity(0.7)),
                       const SizedBox(width: 10),
-                      Text("${propertyNotifier.currentProperty.bathrooms} bathrooms",
+                      Text("${property.bathrooms} bathrooms",
                           style: TextStyle(
                               fontSize: 14,
                               color: const Color(0xff25262B).withOpacity(0.7)))
@@ -153,7 +183,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                           size: 17,
                           color: const Color(0xff25262B).withOpacity(0.7)),
                       const SizedBox(width: 5),
-                      Text("${propertyNotifier.currentProperty.area} sq.ft",
+                      Text("${property.area} sq.ft",
                           style: TextStyle(
                               fontSize: 14,
                               color: const Color(0xff25262B).withOpacity(0.7)))
@@ -177,7 +207,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                          Text(
-                          "${propertyNotifier.currentProperty.owner}",
+                          property.ownerName ?? property.owner ?? '',
                           style: const TextStyle(
                               fontSize: 23,
                               fontWeight: FontWeight.w700,
@@ -229,7 +259,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                     color: const Color(0xff25262B).withOpacity(0.7),
                   ),
                   Expanded(
-                    child: Text(propertyNotifier.currentProperty.address.toString(),
+                    child: Text(property.address.toString(),
                         style: TextStyle(
                             fontSize: 14,
                             color: const Color(0xff25262B).withOpacity(0.7))),
@@ -246,7 +276,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               Wrap(children: [
                 ExpandableText(
-                  propertyNotifier.currentProperty.description.toString(),
+                  property.description.toString(),
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,

@@ -15,10 +15,12 @@ import 'package:houseskape/property_details_screen.dart';
 import 'package:houseskape/search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
+import 'package:houseskape/splash_screen.dart';
+// import 'package:houseskape/api/property_api.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // await migratePropertiesToTopLevel();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   NotificationSettings settings = await messaging.requestPermission(
@@ -54,7 +56,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,26 +66,27 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: const Color(0xfffcf9f4),
           // primaryColor: const Color(0xff1b3359),
           textTheme: const TextTheme(
-            headline1: TextStyle(
+            displayLarge: TextStyle(
                 fontSize: 30.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.black),
-            headline6: TextStyle(
+            titleLarge: TextStyle(
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
-            bodyText1: TextStyle(
+            bodyLarge: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.normal,
                 color: Color(0xFF636363)),
-            bodyText2: TextStyle(
+            bodyMedium: TextStyle(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.black),
           ),
         ),
-        initialRoute: '/login',
+        initialRoute: '/splash',
         routes: {
+          '/splash': (ctx) => const SplashScreen(),
           '/login': (ctx) => const LoginScreen(),
           '/register': (ctx) => const RegistrationScreen(),
           '/dashboard': (ctx) => const DashboardScreen(),

@@ -7,7 +7,7 @@ import 'package:houseskape/widgets/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -43,7 +43,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     PropertyNotifier propertyNotifier = Provider.of<PropertyNotifier>(context);
-    Future<void> _refreshList() async {
+    Future<void> refreshList() async {
       getAllProperties(propertyNotifier, selecteditem.toString());
     }
 
@@ -68,7 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
               padding: const EdgeInsets.all(15.0),
               child: DropdownButtonFormField<String>(
                 decoration: InputDecoration(
-                  labelStyle: Theme.of(context).textTheme.bodyText2,
+                  labelStyle: Theme.of(context).textTheme.bodyMedium,
                   labelText: ' Location ',
                   floatingLabelBehavior: FloatingLabelBehavior.always,
                   enabledBorder: OutlineInputBorder(
@@ -98,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
             RefreshIndicator(
-              onRefresh: _refreshList,
+              onRefresh: refreshList,
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
