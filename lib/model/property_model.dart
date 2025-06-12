@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Property{
-  // int? id;
+  String? id; // Firestore document ID
   DateTime? date;
   String? location;
   String? address;
@@ -14,9 +14,11 @@ class Property{
   num? monthlyRent;
   String? image;
   String? owner;
+  String? ownerId; // UID of the owner
+  String? ownerName; // Display name of the owner
 
   Property({
-    // this.id,
+    this.id,
     this.date,
     this.location,
     this.address,
@@ -28,12 +30,14 @@ class Property{
     this.description,
     this.monthlyRent,
     this.image,
-    this.owner
+    this.owner,
+    this.ownerId,
+    this.ownerName,
   });
 
-  factory Property.fromMap(map){
+  factory Property.fromMap(Map<String, dynamic> map, {String? id}){
     return Property(
-      // id:map['id'],
+      id: id,
       date:(map['date'] as Timestamp).toDate(),
       location: map['location'],
       address: map['address'],
@@ -46,12 +50,14 @@ class Property{
       monthlyRent: map['monthlyRent'],
       image: map['image'],
       owner: map['owner'],
+      ownerId: map['ownerId'],
+      ownerName: map['ownerName'],
     );
   }
 
   Map<String,dynamic> toMap(){
     return{
-      // 'id':id,
+      'id':id,
       'date':date,
       'location':location,
       'address':address,
@@ -63,7 +69,9 @@ class Property{
       'description':description,
       'monthlyRent':monthlyRent,
       'image':image,
-      'owner':owner
+      'owner':owner,
+      'ownerId':ownerId,
+      'ownerName':ownerName,
     };
   }
 }

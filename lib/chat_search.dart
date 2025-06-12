@@ -223,13 +223,10 @@ class _ChatSearchState extends State<ChatSearch> {
                     Expanded(
                       child: TextField(
                         controller: searchEditingController,
-                        // style: simpleTextStyle(),
                         decoration: InputDecoration(
-                          labelStyle: Theme.of(context).textTheme.bodyText2,
-                          // labelText: ' Street Address ',
+                          labelStyle: Theme.of(context).textTheme.bodyMedium,
                           hintText: 'Search Name',
-                          floatingLabelBehavior:
-                              FloatingLabelBehavior.always,
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
                           enabledBorder: OutlineInputBorder(
                             borderSide: const BorderSide(
                                 width: 1, color: Colors.black),

@@ -15,7 +15,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  Stream<QuerySnapshot>? chatRooms;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? chatRooms;
 
   User? user = FirebaseAuth.instance.currentUser;
 
@@ -37,7 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget chatRoomsList() {
     return StreamBuilder(
       stream: chatRooms,
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
         return snapshot.hasData
             ? ListView.builder(
                 itemCount: snapshot.data?.docs.length,

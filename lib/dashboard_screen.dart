@@ -101,7 +101,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         backgroundColor: const Color(0xff1b3359),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white,),
       ),
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xfffcf9f4),
