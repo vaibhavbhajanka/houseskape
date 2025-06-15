@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:houseskape/chat_screen.dart';
 import 'package:houseskape/dashboard_screen.dart';
@@ -15,8 +14,7 @@ import 'package:houseskape/property_details_screen.dart';
 import 'package:houseskape/search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:houseskape/splash_screen.dart';
-// import 'package:houseskape/api/property_api.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -36,13 +34,13 @@ Future<void> main() async {
   print('User granted permission: ${settings.authorizationStatus}');
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  print('Got a message whilst in the foreground!');
-  print('Message data: ${message.data}');
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
 
-  if (message.notification != null) {
-    print('Message also contained a notification: ${message.notification}');
-  }
-});
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+  });
   runApp(
     MultiProvider(
       providers: [
@@ -84,9 +82,8 @@ class MyApp extends StatelessWidget {
                 color: Colors.black),
           ),
         ),
-        initialRoute: '/splash',
+        initialRoute: '/login',
         routes: {
-          '/splash': (ctx) => const SplashScreen(),
           '/login': (ctx) => const LoginScreen(),
           '/register': (ctx) => const RegistrationScreen(),
           '/dashboard': (ctx) => const DashboardScreen(),

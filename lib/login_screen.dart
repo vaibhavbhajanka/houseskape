@@ -6,7 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:houseskape/model/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -30,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value!.isEmpty) return "Please enter your email";
-        if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
+        if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+            .hasMatch(value)) {
           return "Please enter a valid email";
         }
         return null;
@@ -44,12 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
 
-    bool _obscurePassword = true;
+    bool obscurePassword = true;
 
     final passwordField = StatefulBuilder(
       builder: (context, setState) => TextFormField(
         controller: passwordController,
-        obscureText: _obscurePassword,
+        obscureText: obscurePassword,
         validator: (value) {
           if (value!.isEmpty) return "Password is required";
           if (value.length < 6) return "Min. 6 characters";
@@ -62,8 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
           filled: true,
           fillColor: Colors.white,
           suffixIcon: IconButton(
-            icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+            icon:
+                Icon(obscurePassword ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => obscurePassword = !obscurePassword),
           ),
         ),
       ),
@@ -95,7 +97,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Card(
                   color: const Color.fromRGBO(255, 255, 255, 0.85),
                   elevation: 8,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Form(
@@ -132,18 +135,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFFFC1B5B),
                                 padding: EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
                               onPressed: () {
-                                signIn(emailController.text, passwordController.text);
+                                signIn(emailController.text,
+                                    passwordController.text);
                               },
-                              child: Text("Login", style: TextStyle(fontSize: 18, color: Colors.white),),
+                              child: Text(
+                                "Login",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
                             ),
                           ),
                           SizedBox(height: 12),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushReplacementNamed(context, '/register');
+                              Navigator.pushReplacementNamed(
+                                  context, '/register');
                             },
                             child: Text(
                               "Don't have an account? Register",
@@ -159,13 +169,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              icon: Image.asset('assets/images/google.png', height: 24),
+                              icon: Image.asset('assets/images/google.png',
+                                  height: 24),
                               label: Text("Sign in with Google"),
                               onPressed: signInwithGoogle,
                               style: OutlinedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(vertical: 14),
                                 side: BorderSide(color: Color(0xFFFC1B5B)),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                                 foregroundColor: Color(0xFF1B3359),
                               ),
                             ),
@@ -217,7 +229,6 @@ class _LoginScreenState extends State<LoginScreen> {
             errorMessage = "An undefined Error happened.";
         }
         Fluttertoast.showToast(msg: errorMessage!);
-        // print(error.code);
       }
     }
   }
@@ -233,16 +244,16 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       await _auth.signInWithCredential(credential).then(
             (value) => {
-              Navigator.restorablePushNamedAndRemoveUntil(context, '/dashboard', (route) => false),
-              // postDetailsToFirestore()
+              postDetailsToFirestore(),
             },
           );
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message.toString());
-      // throw e;
     }
   }
-  postDetailsToFirestore() async {//implemented for google sign-in
+
+  Future<void> postDetailsToFirestore() async {
+    //implemented for google sign-in
     // calling our firestore
     // calling our user model
     // sending these values
@@ -256,12 +267,14 @@ class _LoginScreenState extends State<LoginScreen> {
     userModel.email = user!.email;
     userModel.uid = user.uid;
     userModel.name = user.displayName;
+    userModel.profileImage = user.photoURL;
 
     await firebaseFirestore
         .collection("users")
         .doc(user.uid)
         .set(userModel.toMap());
     Fluttertoast.showToast(msg: "Login Successful");
-    Navigator.restorablePushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+    Navigator.restorablePushNamedAndRemoveUntil(
+        context, '/dashboard', (route) => false);
   }
 }

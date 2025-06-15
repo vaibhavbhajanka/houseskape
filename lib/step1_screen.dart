@@ -3,11 +3,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:houseskape/model/property_model.dart';
 import 'package:houseskape/step2_screen.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
-import 'package:houseskape/text_theme_extensions.dart';
 
 class Step1Screen extends StatefulWidget {
   final Property? property;
-  const Step1Screen({Key? key, this.property}) : super(key: key);
+  const Step1Screen({super.key, this.property});
   @override
   State<Step1Screen> createState() => _Step1ScreenState();
 }
@@ -62,17 +61,19 @@ class _Step1ScreenState extends State<Step1Screen> {
     }
     addressController.addListener(_updateFormValid);
     areaController.addListener(_updateFormValid);
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(_updateFormValid));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => setState(_updateFormValid));
   }
 
   void _updateFormValid() {
-    final valid =
-        selecteditem != null &&
+    final valid = selecteditem != null &&
         items.contains(selecteditem) &&
         selectedType != null &&
         selectedType!.isNotEmpty &&
-        selectedBedroomNumber != null && selectedBedroomNumber != 0 &&
-        selectedBathroomNumber != null && selectedBathroomNumber != 0 &&
+        selectedBedroomNumber != null &&
+        selectedBedroomNumber != 0 &&
+        selectedBathroomNumber != null &&
+        selectedBathroomNumber != 0 &&
         areaController.text.isNotEmpty &&
         addressController.text.isNotEmpty;
     if (isFormValid != valid) {
@@ -84,22 +85,6 @@ class _Step1ScreenState extends State<Step1Screen> {
 
   @override
   Widget build(BuildContext context) {
-    final newProperty = Property(
-      id: widget.property?.id,
-      date: widget.property?.date,
-      location: null,
-      address: null,
-      type: null,
-      bedrooms: null,
-      bathrooms: null,
-      area: null,
-      adTitle: null,
-      description: null,
-      monthlyRent: null,
-      image: null,
-      owner: null,
-    );
-
     // Step progress bar
     final progressBar = Padding(
       padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -124,7 +109,8 @@ class _Step1ScreenState extends State<Step1Screen> {
             ),
           ),
           const SizedBox(width: 16),
-          const Text('Step 1 of 2', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('Step 1 of 2',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ],
       ),
     );
@@ -149,7 +135,8 @@ class _Step1ScreenState extends State<Step1Screen> {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
         ),
-        errorStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        errorStyle:
+            const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
       ),
     );
 
@@ -172,7 +159,8 @@ class _Step1ScreenState extends State<Step1Screen> {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
         ),
-        errorStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        errorStyle:
+            const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
       ),
     );
 
@@ -182,7 +170,8 @@ class _Step1ScreenState extends State<Step1Screen> {
       children: [
         const Padding(
           padding: EdgeInsets.only(left: 4.0, bottom: 4.0),
-          child: Text('Bedrooms', style: TextStyle(fontWeight: FontWeight.bold)),
+          child:
+              Text('Bedrooms', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         Row(
           children: [
@@ -213,7 +202,11 @@ class _Step1ScreenState extends State<Step1Screen> {
         if (selectedBedroomNumber == null || selectedBedroomNumber == 0)
           const Padding(
             padding: EdgeInsets.only(left: 4.0, top: 4.0),
-            child: Text('Select number of bedrooms', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
+            child: Text('Select number of bedrooms',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12)),
           ),
       ],
     );
@@ -223,7 +216,8 @@ class _Step1ScreenState extends State<Step1Screen> {
       children: [
         const Padding(
           padding: EdgeInsets.only(left: 4.0, bottom: 4.0),
-          child: Text('Bathrooms', style: TextStyle(fontWeight: FontWeight.bold)),
+          child:
+              Text('Bathrooms', style: TextStyle(fontWeight: FontWeight.bold)),
         ),
         Row(
           children: [
@@ -254,35 +248,25 @@ class _Step1ScreenState extends State<Step1Screen> {
         if (selectedBathroomNumber == null || selectedBathroomNumber == 0)
           const Padding(
             padding: EdgeInsets.only(left: 4.0, top: 4.0),
-            child: Text('Select number of bathrooms', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
+            child: Text('Select number of bathrooms',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12)),
           ),
       ],
     );
 
-    // Continue button state
-    // bool isFormValid = _formKey.currentState?.validate() == true &&
-    //     selecteditem != null &&
-    //     items.contains(selecteditem) &&
-    //     selectedType != null &&
-    //     selectedType!.isNotEmpty &&
-    //     selectedBedroomNumber != null && selectedBedroomNumber != 0 &&
-    //     selectedBathroomNumber != null && selectedBathroomNumber != 0 &&
-    //     areaController.text.isNotEmpty &&
-    //     addressController.text.isNotEmpty;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text('Step 1'),
-        backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        leading: Icons.arrow_back_ios_new_rounded,
+        title: 'Step 1',
+        widget: const SizedBox.shrink(),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        onPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -302,12 +286,15 @@ class _Step1ScreenState extends State<Step1Screen> {
                       child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
                           labelText: 'Location',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15)),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
-                            borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
+                            borderSide: const BorderSide(
+                                color: Color(0xFF1B3359), width: 2),
                           ),
-                          errorStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                          errorStyle: const TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
                         ),
                         value: selecteditem,
                         items: items
@@ -334,7 +321,8 @@ class _Step1ScreenState extends State<Step1Screen> {
                         contentPadding: EdgeInsets.zero,
                         title: const Text(
                           'Property Type',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20),
                         ),
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 8.0),
@@ -354,7 +342,9 @@ class _Step1ScreenState extends State<Step1Screen> {
                                   },
                                   selectedColor: const Color(0xFF1B3359),
                                   labelStyle: TextStyle(
-                                    color: _indexSelected == 0 ? Colors.white : Colors.black,
+                                    color: _indexSelected == 0
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                   backgroundColor: Colors.grey[200],
                                 ),
@@ -370,7 +360,9 @@ class _Step1ScreenState extends State<Step1Screen> {
                                   },
                                   selectedColor: const Color(0xFF1B3359),
                                   labelStyle: TextStyle(
-                                    color: _indexSelected == 1 ? Colors.white : Colors.black,
+                                    color: _indexSelected == 1
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                   backgroundColor: Colors.grey[200],
                                 ),
@@ -386,7 +378,9 @@ class _Step1ScreenState extends State<Step1Screen> {
                                   },
                                   selectedColor: const Color(0xFF1B3359),
                                   labelStyle: TextStyle(
-                                    color: _indexSelected == 2 ? Colors.white : Colors.black,
+                                    color: _indexSelected == 2
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                   backgroundColor: Colors.grey[200],
                                 ),
@@ -402,7 +396,9 @@ class _Step1ScreenState extends State<Step1Screen> {
                                   },
                                   selectedColor: const Color(0xFF1B3359),
                                   labelStyle: TextStyle(
-                                    color: _indexSelected == 3 ? Colors.white : Colors.black,
+                                    color: _indexSelected == 3
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                   backgroundColor: Colors.grey[200],
                                 ),
@@ -434,9 +430,12 @@ class _Step1ScreenState extends State<Step1Screen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isFormValid ? const Color(0xFF1B3359) : Colors.grey[400],
+                    backgroundColor: isFormValid
+                        ? const Color(0xFF1B3359)
+                        : Colors.grey[400],
                     padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
                     elevation: isFormValid ? 4 : 0,
                   ),
                   onPressed: isFormValid
@@ -446,11 +445,15 @@ class _Step1ScreenState extends State<Step1Screen> {
                                 !items.contains(selecteditem) ||
                                 selectedType == null ||
                                 selectedType!.isEmpty ||
-                                selectedBedroomNumber == null || selectedBedroomNumber == 0 ||
-                                selectedBathroomNumber == null || selectedBathroomNumber == 0 ||
+                                selectedBedroomNumber == null ||
+                                selectedBedroomNumber == 0 ||
+                                selectedBathroomNumber == null ||
+                                selectedBathroomNumber == 0 ||
                                 areaController.text.isEmpty ||
                                 addressController.text.isEmpty) {
-                              Fluttertoast.showToast(msg: "Please fill all fields and select valid options.");
+                              Fluttertoast.showToast(
+                                  msg:
+                                      "Please fill all fields and select valid options.");
                               return;
                             }
                             try {
@@ -475,14 +478,16 @@ class _Step1ScreenState extends State<Step1Screen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Step2Screen(property: mergedProperty),
+                                  builder: (context) =>
+                                      Step2Screen(property: mergedProperty),
                                 ),
                               );
                             } catch (error) {
                               Fluttertoast.showToast(msg: error.toString());
                             }
                           } else {
-                            Fluttertoast.showToast(msg: "Please fill all fields correctly.");
+                            Fluttertoast.showToast(
+                                msg: "Please fill all fields correctly.");
                           }
                         }
                       : null,

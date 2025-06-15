@@ -2,6 +2,7 @@
 /// newer versions of Flutter where they have been renamed.
 /// This prevents having to touch every widget file whilst upgrading.
 library;
+
 import 'package:flutter/material.dart';
 
 extension LegacyTextTheme on TextTheme {
@@ -10,4 +11,4 @@ extension LegacyTextTheme on TextTheme {
   TextStyle? get headline6 => titleLarge;
   TextStyle? get headline5 => titleMedium;
   TextStyle? get headline4 => titleSmall;
-} 
+}

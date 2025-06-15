@@ -3,7 +3,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:houseskape/text_theme_extensions.dart';
 
 class FillDetailsScreen extends StatefulWidget {
-  const FillDetailsScreen({Key? key}) : super(key: key);
+  const FillDetailsScreen({super.key});
 
   @override
   State<FillDetailsScreen> createState() => _FillDetailsScreenState();

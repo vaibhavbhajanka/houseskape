@@ -3,10 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:houseskape/model/user_model.dart';
-import './login_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({Key? key}) : super(key: key);
+  const RegistrationScreen({super.key});
 
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
@@ -22,7 +21,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   // editing controller
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController nameController = TextEditingController();
 
   @override
@@ -31,7 +31,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       controller: nameController,
       keyboardType: TextInputType.name,
       validator: (value) {
-        RegExp regex = RegExp(r'^.{3,}[0m$');
+        RegExp regex = RegExp(r'^.{3,}');
         if (value!.isEmpty) {
           return ("Name cannot be Empty");
         }
@@ -54,7 +54,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value!.isEmpty) return ("Please enter your email");
-        if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)) {
+        if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+            .hasMatch(value)) {
           return ("Please enter a valid email");
         }
         return null;
@@ -68,13 +69,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
 
-    bool _obscurePassword = true;
-    bool _obscureConfirmPassword = true;
+    bool obscurePassword = true;
+    bool obscureConfirmPassword = true;
 
     final passwordField = StatefulBuilder(
       builder: (context, setState) => TextFormField(
         controller: passwordController,
-        obscureText: _obscurePassword,
+        obscureText: obscurePassword,
         validator: (value) {
           if (value!.isEmpty) return "Password is required";
           if (value.length < 6) return "Min. 6 characters";
@@ -87,8 +88,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           filled: true,
           fillColor: Colors.white,
           suffixIcon: IconButton(
-            icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
-            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+            icon:
+                Icon(obscurePassword ? Icons.visibility : Icons.visibility_off),
+            onPressed: () => setState(() => obscurePassword = !obscurePassword),
           ),
         ),
       ),
@@ -97,7 +99,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final confirmPasswordField = StatefulBuilder(
       builder: (context, setState) => TextFormField(
         controller: confirmPasswordController,
-        obscureText: _obscureConfirmPassword,
+        obscureText: obscureConfirmPassword,
         validator: (value) {
           if (confirmPasswordController.text != passwordController.text) {
             return "Passwords don't match";
@@ -111,8 +113,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           filled: true,
           fillColor: Colors.white,
           suffixIcon: IconButton(
-            icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
-            onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+            icon: Icon(obscureConfirmPassword
+                ? Icons.visibility
+                : Icons.visibility_off),
+            onPressed: () => setState(
+                () => obscureConfirmPassword = !obscureConfirmPassword),
           ),
         ),
       ),
@@ -144,7 +149,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Card(
                   color: const Color.fromRGBO(255, 255, 255, 0.85),
                   elevation: 8,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Form(
@@ -185,12 +191,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFFFC1B5B),
                                 padding: EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
                               ),
                               onPressed: () {
-                                signUp(emailController.text, passwordController.text);
+                                signUp(emailController.text,
+                                    passwordController.text);
                               },
-                              child: Text("Register", style: TextStyle(fontSize: 18, color: Colors.white)),
+                              child: Text("Register",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white)),
                             ),
                           ),
                           SizedBox(height: 12),
@@ -218,6 +228,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
   }
+
   void signUp(String email, String password) async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -254,7 +265,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       }
     }
   }
-  postDetailsToFirestore() async {
+
+  Future<void> postDetailsToFirestore() async {
     // calling our firestore
     // calling our user model
     // sedning these values
@@ -274,6 +286,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         .doc(user.uid)
         .set(userModel.toMap());
     Fluttertoast.showToast(msg: "Account created successfully :) ");
-    Navigator.restorablePushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+    Navigator.restorablePushNamedAndRemoveUntil(
+        context, '/dashboard', (route) => false);
   }
 }

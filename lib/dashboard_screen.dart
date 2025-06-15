@@ -7,14 +7,13 @@ import 'package:houseskape/saved_screen.dart';
 import 'package:houseskape/step1_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-
   int currentTab = 0;
 
   final screens = [
@@ -92,7 +91,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const Step1Screen(),),);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Step1Screen(),
+            ),
+          );
         },
         shape: const CircleBorder(
           side: BorderSide(
@@ -101,7 +105,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         backgroundColor: const Color(0xff1b3359),
-        child: const Icon(Icons.add, color: Colors.white,),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xfffcf9f4),

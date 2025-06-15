@@ -25,7 +25,6 @@ class Step2Screen extends StatefulWidget {
 class _Step2ScreenState extends State<Step2Screen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _auth = FirebaseAuth.instance;
   User? user = FirebaseAuth.instance.currentUser;
 
   final TextEditingController adTitleController = TextEditingController();
@@ -48,7 +47,6 @@ class _Step2ScreenState extends State<Step2Screen> {
         .get()
         .then((value) {
       loggedInUser = UserModel.fromMap(value.data());
-      // setState(() {});
     });
     // Pre-fill fields if editing
     if (widget.property.adTitle != null) {
@@ -65,75 +63,9 @@ class _Step2ScreenState extends State<Step2Screen> {
     descriptionController.addListener(() => setState(() {}));
     rentController.addListener(() => setState(() {}));
     // Note: image is not pre-filled for local file, but can show network image if needed
-  } 
-
-  _showImage() {
-    if (_imageFile == null) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Center(
-          child: OutlinedButton(
-            // style: ButtonStyle(
-            //   side:
-            // ),
-
-            child: Padding(
-              padding: const EdgeInsets.all(50.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.add),
-                  Text(
-                    'Add Image',
-                  )
-                ],
-              ),
-            ),
-            onPressed: () {
-              _getLocalImage();
-            },
-          ),
-        ),
-      );
-    } else if (_imageFile != null) {
-      // print('showing image from local file');
-
-      return Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Stack(
-          alignment: AlignmentDirectional.bottomCenter,
-          children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                _imageFile!,
-                fit: BoxFit.cover,
-                height: 250,
-              ),
-            ),
-            TextButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    const EdgeInsets.all(8)),
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black54),
-              ),
-              child: const Text(
-                'Change Image',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400),
-              ),
-              onPressed: () => _getLocalImage(),
-            )
-          ],
-        ),
-      );
-    }
   }
 
-  _getLocalImage() async {
+  Future<void> _getLocalImage() async {
     final imageFile = await ImagePicker().pickImage(
         source: ImageSource.gallery, imageQuality: 50, maxWidth: 400);
 
@@ -170,7 +102,8 @@ class _Step2ScreenState extends State<Step2Screen> {
             ),
           ),
           const SizedBox(width: 16),
-          const Text('Step 2 of 2', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('Step 2 of 2',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ],
       ),
     );
@@ -194,7 +127,8 @@ class _Step2ScreenState extends State<Step2Screen> {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
         ),
-        errorStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        errorStyle:
+            const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
       ),
     );
 
@@ -218,7 +152,8 @@ class _Step2ScreenState extends State<Step2Screen> {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
         ),
-        errorStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        errorStyle:
+            const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
       ),
     );
 
@@ -241,7 +176,8 @@ class _Step2ScreenState extends State<Step2Screen> {
           borderRadius: BorderRadius.circular(20),
           borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
         ),
-        errorStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        errorStyle:
+            const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
       ),
     );
 
@@ -280,7 +216,8 @@ class _Step2ScreenState extends State<Step2Screen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         padding: const EdgeInsets.all(6),
-                        child: const Icon(Icons.close, color: Colors.white, size: 24),
+                        child: const Icon(Icons.close,
+                            color: Colors.white, size: 24),
                       ),
                     ),
                   ),
@@ -295,13 +232,15 @@ class _Step2ScreenState extends State<Step2Screen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         padding: const EdgeInsets.all(6),
-                        child: const Icon(Icons.edit, color: Colors.white, size: 24),
+                        child: const Icon(Icons.edit,
+                            color: Colors.white, size: 24),
                       ),
                     ),
                   ),
                 ],
               )
-            : (widget.property.image != null && widget.property.image!.isNotEmpty)
+            : (widget.property.image != null &&
+                    widget.property.image!.isNotEmpty)
                 ? Stack(
                     children: [
                       ClipRRect(
@@ -311,8 +250,10 @@ class _Step2ScreenState extends State<Step2Screen> {
                           width: double.infinity,
                           height: 220,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) => const Icon(Icons.image_not_supported, size: 100),
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator()),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.image_not_supported, size: 100),
                         ),
                       ),
                       Positioned(
@@ -326,7 +267,8 @@ class _Step2ScreenState extends State<Step2Screen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: const EdgeInsets.all(6),
-                            child: const Icon(Icons.edit, color: Colors.white, size: 24),
+                            child: const Icon(Icons.edit,
+                                color: Colors.white, size: 24),
                           ),
                         ),
                       ),
@@ -336,9 +278,12 @@ class _Step2ScreenState extends State<Step2Screen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(Icons.add_a_photo, size: 48, color: Color(0xFF1B3359)),
+                        Icon(Icons.add_a_photo,
+                            size: 48, color: Color(0xFF1B3359)),
                         SizedBox(height: 12),
-                        Text('Add Photo', style: TextStyle(fontSize: 18, color: Color(0xFF1B3359))),
+                        Text('Add Photo',
+                            style: TextStyle(
+                                fontSize: 18, color: Color(0xFF1B3359))),
                       ],
                     ),
                   ),
@@ -346,31 +291,30 @@ class _Step2ScreenState extends State<Step2Screen> {
     );
 
     // Post button state
-    bool isFormValid =
-        adTitleController.text.isNotEmpty &&
+    bool isFormValid = adTitleController.text.isNotEmpty &&
         descriptionController.text.isNotEmpty &&
         rentController.text.isNotEmpty &&
-        (_imageFile != null || (widget.property.image != null && widget.property.image!.isNotEmpty));
+        (_imageFile != null ||
+            (widget.property.image != null &&
+                widget.property.image!.isNotEmpty));
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text('Step 2'),
-        backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        leading: Icons.arrow_back_ios_new_rounded,
+        title: 'Step 2',
+        widget: const SizedBox.shrink(),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        onPressed: () {
+          Navigator.pop(context);
+        },
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 18.0, vertical: 12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -404,9 +348,12 @@ class _Step2ScreenState extends State<Step2Screen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isFormValid ? const Color(0xFF1B3359) : Colors.grey[400],
+                          backgroundColor: isFormValid
+                              ? const Color(0xFF1B3359)
+                              : Colors.grey[400],
                           padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
                           elevation: isFormValid ? 4 : 0,
                         ),
                         onPressed: isFormValid && !_isLoading
@@ -490,7 +437,8 @@ class _Step2ScreenState extends State<Step2Screen> {
 
       // Add to PropertyNotifier for instant UI update
       if (mounted) {
-        final propertyNotifier = Provider.of<PropertyNotifier>(context, listen: false);
+        final propertyNotifier =
+            Provider.of<PropertyNotifier>(context, listen: false);
         if (widget.property.id != null) {
           propertyNotifier.updateProperty(newProperty);
         } else {
@@ -504,8 +452,10 @@ class _Step2ScreenState extends State<Step2Screen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: const Icon(Icons.check_circle, color: Colors.green, size: 60),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title:
+                const Icon(Icons.check_circle, color: Colors.green, size: 60),
             content: Text(
               widget.property.id != null
                   ? 'Your property has been updated!'
@@ -518,14 +468,18 @@ class _Step2ScreenState extends State<Step2Screen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1B3359),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 14),
                   ),
                   onPressed: () {
                     Navigator.pop(context); // Close dialog
-                    Navigator.popUntil(context, ModalRoute.withName('/dashboard'));
+                    Navigator.popUntil(
+                        context, ModalRoute.withName('/dashboard'));
                   },
-                  child: const Text('Go to Dashboard', style: TextStyle(fontSize: 18, color: Colors.white)),
+                  child: const Text('Go to Dashboard',
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
               ),
             ],
@@ -533,7 +487,7 @@ class _Step2ScreenState extends State<Step2Screen> {
         );
       }
     } catch (error) {
-      Fluttertoast.showToast(msg: "Error: "+ error.toString());
+      Fluttertoast.showToast(msg: "Error: $error");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

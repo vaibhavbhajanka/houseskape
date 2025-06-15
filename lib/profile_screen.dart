@@ -5,6 +5,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:houseskape/home_icons.dart';
 import 'package:houseskape/model/user_model.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,7 +19,9 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final auth = FirebaseAuth.instance;
   final googleSignIn = GoogleSignIn();
-  
+  final ImagePicker _picker = ImagePicker();
+  bool _uploadingImage = false;
+
   User? user = FirebaseAuth.instance.currentUser;
 
   UserModel loggedInUser = UserModel();
@@ -30,17 +35,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .get()
         .then((value) {
       loggedInUser = UserModel.fromMap(value.data());
-      // print(loggedInUser);
       setState(() {});
     });
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
+    final String? profileImageUrl = _getProfileImageUrl();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: CustomAppBar(
-        onPressed: (){},
+        leading: null,
         widget: PopupMenuButton(
           icon: const Icon(
             Icons.more_vert,
@@ -66,18 +71,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                 Expanded(
+                Expanded(
                   flex: 3,
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 50,
-                      backgroundImage:
-                      NetworkImage("${loggedInUser.profileImage}"),
-                      // AssetImage(
-                      //   "assets/images/dp.jpg",
-                      // ),
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.grey[200],
+                          radius: 50,
+                          backgroundImage: profileImageUrl != null
+                              ? NetworkImage(profileImageUrl)
+                              : null,
+                          child: profileImageUrl == null
+                              ? const Icon(Icons.person,
+                                  size: 50, color: Color(0xff25262b))
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _pickAndUploadImage,
+                            child: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.white,
+                              child: _uploadingImage
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.camera_alt,
+                                      size: 16, color: Color(0xff25262b)),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -88,21 +120,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         '${loggedInUser.name}',
-                        // "${user?.displayName}",
                         style: const TextStyle(
                           color: Color(0xff25262b),
                           fontWeight: FontWeight.w500,
                           fontSize: 35,
                         ),
                       ),
-                      // Text(
-                      //   'Turing',
-                      //   style: TextStyle(
-                      //     color: Color(0xff25262b),
-                      //     fontWeight: FontWeight.w500,
-                      //     fontSize: 35,
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -125,9 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           fontSize: 20.0,
                         ),
                       ),
-                      onPressed: () {
-                        // signIn(emailController.text, passwordController.text);
-                      },
+                      onPressed: () {},
                     ),
                   ),
                 ),
@@ -146,7 +167,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       onPressed: () {
-                        // signIn(emailController.text, passwordController.text);
                         Navigator.pushNamed(context, '/listings');
                       },
                     ),
@@ -189,6 +209,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  String? _getProfileImageUrl() {
+    // Prefer Firestore stored image if available
+    if (loggedInUser.profileImage != null &&
+        loggedInUser.profileImage!.isNotEmpty) {
+      return loggedInUser.profileImage;
+    }
+    // Fall back to Google photo URL if user signed in with Google
+    if (user != null) {
+      final hasGoogleProvider =
+          user!.providerData.any((p) => p.providerId == 'google.com');
+      if (hasGoogleProvider &&
+          user!.photoURL != null &&
+          user!.photoURL!.isNotEmpty) {
+        return user!.photoURL;
+      }
+    }
+    return null; // No image available
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (pickedFile == null) return;
+
+    setState(() => _uploadingImage = true);
+    try {
+      final uid = user!.uid;
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child('$uid.jpg');
+      await ref.putFile(File(pickedFile.path));
+      final url = await ref.getDownloadURL();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .update({'profileImage': url});
+      setState(() {
+        loggedInUser.profileImage = url;
+      });
+    } catch (e) {
+      // Handle error silently for now or show toast
+    } finally {
+      if (mounted) {
+        setState(() => _uploadingImage = false);
+      }
+    }
   }
 
   Future<void> logout(BuildContext context) async {

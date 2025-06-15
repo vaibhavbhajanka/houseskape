@@ -7,7 +7,10 @@ import 'package:houseskape/widgets/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:houseskape/model/property_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:houseskape/repository/chat_repository.dart';
+import 'package:houseskape/chat.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:yandex_mapkit/yandex_mapkit.dart';
 
 bool bookmarked = false;
@@ -15,13 +18,14 @@ bool bookmarked = false;
 // GeoCode geoCode = GeoCode();
 
 class PropertyDetailsScreen extends StatefulWidget {
-  const PropertyDetailsScreen({Key? key}) : super(key: key);
+  const PropertyDetailsScreen({super.key});
   @override
   State<PropertyDetailsScreen> createState() => _PropertyDetailsScreenState();
 }
 
 class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
   Property? propertyArg;
+  bool _isSaved = false;
 
   @override
   void didChangeDependencies() {
@@ -29,6 +33,60 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args != null && args is Property) {
       propertyArg = args;
+    }
+    _checkIfSaved();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _checkIfSaved() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    final property = propertyArg ??
+        Provider.of<PropertyNotifier>(context, listen: false).currentProperty;
+    if (property.id == null) return;
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('saved')
+        .doc(property.id)
+        .get();
+    if (mounted) {
+      setState(() {
+        _isSaved = doc.exists;
+      });
+    }
+  }
+
+  Future<void> _toggleSave() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    final property = propertyArg ??
+        Provider.of<PropertyNotifier>(context, listen: false).currentProperty;
+    if (property.id == null) return;
+
+    final ref = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('saved')
+        .doc(property.id);
+
+    if (_isSaved) {
+      await ref.delete();
+    } else {
+      await ref.set({
+        'propertyId': property.id,
+        'savedAt': FieldValue.serverTimestamp(),
+      });
+    }
+
+    if (mounted) {
+      setState(() {
+        _isSaved = !_isSaved;
+      });
     }
   }
 
@@ -39,14 +97,25 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
     return Scaffold(
       // backgroundColor: Colors.white,
       appBar: CustomAppBar(
+        leading: Icons.arrow_back_ios_new_rounded,
         onPressed: () {
           Navigator.pop(context);
         },
         title: 'Details',
-        widget: const Icon(
-          Icons.more_vert,
-          color: Color(0xfffcf9f4),
+        widget: IconButton(
+          onPressed: _toggleSave,
+          icon: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, anim) =>
+                ScaleTransition(scale: anim, child: child),
+            child: Icon(
+              _isSaved ? Icons.bookmark : Icons.bookmark_outline,
+              key: ValueKey(_isSaved),
+              color: const Color(0xff25262b),
+            ),
+          ),
         ),
+        elevation: 0,
       ),
       // appBar: AppBar(
       //   backgroundColor: Colors.white,
@@ -95,7 +164,7 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
           color: const Color(0xfffcf9f4),
           shape: const CircularNotchedRectangle(),
           child: Padding(
-            padding: const EdgeInsets.all(15.0),
+            padding: const EdgeInsets.all(10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -118,28 +187,47 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: property.image != null && property.image!.startsWith('http')
-                    ? CachedNetworkImage(
-                        imageUrl: property.image!,
-                        width: 200,
-                        placeholder: (context, url) => Shimmer.fromColors(
-                          baseColor: Colors.grey[300]!,
-                          highlightColor: Colors.grey[100]!,
-                          child: Container(
-                            width: 200,
-                            height: 120,
-                            color: Colors.white,
+                child:
+                    property.image != null && property.image!.startsWith('http')
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: CachedNetworkImage(
+                                imageUrl: property.image!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    size: 60,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: AspectRatio(
+                              aspectRatio: 16 / 9,
+                              child: Image.asset(
+                                "assets/images/house2.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                        ),
-                        errorWidget: (context, url, error) => const Icon(Icons.image_not_supported, size: 100),
-                      )
-                    : Image.asset(
-                        "assets/images/house2.png",
-                        width: 200,
-                      ),
               ),
               const SizedBox(height: 15),
-               Text(
+              Text(
                 property.adTitle.toString(),
                 style: const TextStyle(
                     fontSize: 22,
@@ -198,20 +286,47 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CircleAvatar(
-                      minRadius: 20,
-                      child: Image.asset("assets/images/person2.png"),
+                    FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                      future: FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(property.ownerId)
+                          .get(),
+                      builder: (context, snapshot) {
+                        final data = snapshot.data?.data();
+                        final profileUrl = data?['profileImage'] as String?;
+
+                        return CircleAvatar(
+                          radius: 25,
+                          backgroundColor: const Color(0xffcccccc),
+                          backgroundImage:
+                              profileUrl != null && profileUrl.isNotEmpty
+                                  ? NetworkImage(profileUrl)
+                                  : null,
+                          child: profileUrl == null || profileUrl.isEmpty
+                              ? Text(
+                                  (property.ownerName ??
+                                          property.owner ??
+                                          '?')[0]
+                                      .toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Color(0xff25262b),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : null,
+                        );
+                      },
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                         Text(
+                        Text(
                           property.ownerName ?? property.owner ?? '',
                           style: const TextStyle(
                               fontSize: 23,
                               fontWeight: FontWeight.w700,
-                              color:Color(0xff1B3359)),
+                              color: Color(0xff1B3359)),
                         ),
                         Text(
                           "Landlord",
@@ -227,16 +342,39 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Material(
-                            elevation: 5,
-                            child: InkWell(
-                                onTap: () {},
-                                child: const Icon(Icons.message_rounded))),
-                        const SizedBox(width: 10),
-                        Material(
-                            elevation: 5,
-                            child: InkWell(
-                                onTap: () {},
-                                child: const Icon(Icons.phone_outlined)))
+                          child: InkWell(
+                            onTap: () async {
+                              final currentUser =
+                                  FirebaseAuth.instance.currentUser;
+                              final property = propertyArg ??
+                                  propertyNotifier.currentProperty;
+                              final ownerUid = property.ownerId;
+                              if (currentUser == null ||
+                                  ownerUid == null ||
+                                  ownerUid == currentUser.uid) return;
+                              final repo = FirestoreChatRepository();
+                              final roomId = await repo.createOrGetRoom(
+                                  currentUser.uid, ownerUid);
+
+                              // Retrieve owner's display name from users collection
+                              final snap = await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(ownerUid)
+                                  .get();
+                              final ownerName = snap.data()?['name'] ?? 'User';
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Chat(
+                                      chatRoomId: roomId,
+                                      otherUserName: ownerName),
+                                ),
+                              );
+                            },
+                            child: const Icon(Icons.message_rounded),
+                          ),
+                        ),
                       ],
                     )
                   ],
@@ -244,12 +382,13 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
               ),
               const Divider(thickness: 1.5, color: Color(0xffE7E7E7)),
               const Text(
-                "Where you'll be",
+                "Location",
                 style: TextStyle(
                     fontSize: 16,
                     color: Color(0xff25262B),
                     fontWeight: FontWeight.w700),
               ),
+              const SizedBox(height: 8),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -266,14 +405,38 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                   )
                 ],
               ),
-              // SizedBox(
-              //   height: 160,
-              //   child: YandexMap(
-              //     onMapCreated: onMapCreated,
-              //   ),
-              // ),
-              const Text("Properties Details",
+              const SizedBox(height: 16),
+              Container(
+                height: 160,
+                decoration: BoxDecoration(
+                  color: const Color(0xffE7E7E7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.map_outlined,
+                        size: 48,
+                        color: Color(0xff25262B),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Map view coming soon",
+                        style: TextStyle(
+                          color: Color(0xff25262B),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text("Description",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
               Wrap(children: [
                 ExpandableText(
                   property.description.toString(),

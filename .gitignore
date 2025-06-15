@@ -60,3 +60,6 @@ ios/Flutter/Debug.xcconfig
 ios/Flutter/Release.xcconfig
 ios/Flutter/Profile.xcconfig
 ios/Flutter/flutter_export_environment.sh
+ios/Runner/Info.plist
+
+docs/

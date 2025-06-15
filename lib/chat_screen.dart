@@ -1,381 +1,225 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:houseskape/api/property_api.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:houseskape/repository/chat_repository.dart';
+import 'package:houseskape/providers/chat_providers.dart';
+import 'package:houseskape/model/chat_room_model.dart';
 import 'package:houseskape/chat.dart';
 import 'package:houseskape/chat_search.dart';
-import 'package:houseskape/model/user_model.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
-
-  @override
-  State<ChatScreen> createState() => _ChatScreenState();
-}
-
-class _ChatScreenState extends State<ChatScreen> {
-  Stream<QuerySnapshot<Map<String, dynamic>>>? chatRooms;
-
-  User? user = FirebaseAuth.instance.currentUser;
-
-  UserModel loggedInUser = UserModel();
-
-  @override
-  void initState() {
-    getUserInfogetChats();
-    super.initState();
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get()
-        .then((value) {
-      loggedInUser = UserModel.fromMap(value.data());
-    });
-  }
-
-  Widget chatRoomsList() {
-    return StreamBuilder(
-      stream: chatRooms,
-      builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                itemCount: snapshot.data?.docs.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  Map<String, dynamic> data =
-                      snapshot.data!.docs[index].data() as Map<String, dynamic>;
-                  return ChatRoomsTile(
-                    userName: data['chatRoomId']
-                        .toString()
-                        .replaceAll("_", "")
-                        .replaceAll(loggedInUser.name.toString(), ""),
-                    chatRoomId: data["chatRoomId"],
-                  );
-                })
-            : Container();
-      },
-    );
-  }
-
-  getUserInfogetChats() async {
-    await getUserChats(loggedInUser.name.toString()).then((snapshots) {
-      setState(() {
-        chatRooms = snapshots;
-        print(
-            "we got the data + ${chatRooms.toString()} this is name  ${loggedInUser.name.toString()}");
-      });
-    });
-  }
+class ChatScreen extends StatelessWidget {
+  const ChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return const Center(child: Text('Not logged in'));
+    }
+    return ChangeNotifierProvider(
+      create: (_) => ChatRoomsProvider(
+        repository: FirestoreChatRepository(),
+        uid: user.uid,
+      ),
+      child: const _ChatScreenBody(),
+    );
+  }
+}
+
+class _ChatScreenBody extends StatelessWidget {
+  const _ChatScreenBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<ChatRoomsProvider>(context);
     return Scaffold(
       appBar: CustomAppBar(
-        widget: const Icon(
-          Icons.search,
-          color: Color(0xfffcf9f4),
-        ),
-        leading: Icons.search,
+        leading: null,
         title: 'Message',
-        onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const ChatSearch()));
-        },
-
-        // elevation: ,
-        // onPressed: (){
-
-        // },
+        widget: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const ChatSearch()));
+          },
+          child: const Icon(
+            Icons.search,
+            color: Color(0xff25262b),
+          ),
+        ),
+        elevation: 0,
       ),
-      body: Container(
-        child: chatRoomsList(),
-      ),
+      body: provider.loading
+          ? const Center(child: CircularProgressIndicator())
+          : provider.error != null
+              ? Center(child: Text('Error: ${provider.error}'))
+              : provider.rooms.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 80,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'No chats yet',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Start a conversation with a property owner',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: provider.rooms.length,
+                      itemBuilder: (context, index) {
+                        final room = provider.rooms[index];
+                        final currentUid =
+                            FirebaseAuth.instance.currentUser!.uid;
+                        final otherUid = room.participants.firstWhere(
+                          (k) => k != currentUid,
+                          orElse: () => '',
+                        );
+                        return ChatRoomsTile(
+                          room: room,
+                          otherUid: otherUid,
+                        );
+                      },
+                    ),
     );
   }
 }
 
 class ChatRoomsTile extends StatelessWidget {
-  final String userName;
-  final String chatRoomId;
-
-  const ChatRoomsTile(
-      {Key? key, required this.userName, required this.chatRoomId})
-      : super(key: key);
+  final ChatRoom room;
+  final String otherUid;
+  const ChatRoomsTile({super.key, required this.room, required this.otherUid});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Chat(
-                      chatRoomId: chatRoomId,
-                    )));
+    final lastMsg = room.lastMessage;
+
+    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      future:
+          FirebaseFirestore.instance.collection('users').doc(otherUid).get(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data();
+        final name = data?['name'] ?? otherUid;
+        final profileUrl = data?['profileImage'] as String?;
+
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      Chat(chatRoomId: room.id, otherUserName: name)),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundColor: const Color(0xffcccccc),
+                      backgroundImage:
+                          profileUrl != null && profileUrl.isNotEmpty
+                              ? NetworkImage(profileUrl)
+                              : null,
+                      child: profileUrl == null || profileUrl.isEmpty
+                          ? Text(
+                              name.isNotEmpty ? name[0].toUpperCase() : '?',
+                              style: const TextStyle(
+                                color: Color(0xff25262b),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Color(0xff25262b),
+                                  ),
+                                ),
+                              ),
+                              if (lastMsg != null)
+                                Text(
+                                  _relativeTime(lastMsg.timestamp.toDate()),
+                                  style: const TextStyle(
+                                      fontSize: 13, color: Color(0xffb0b0b0)),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  lastMsg != null
+                                      ? lastMsg.text
+                                      : 'No messages yet',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      fontSize: 15, color: Color(0xff636363)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                const Divider(height: 1, color: Color(0xffe7e7e7)),
+              ],
+            ),
+          ),
+        );
       },
-      child: Container(
-        color: Colors.black26,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Row(
-          children: [
-            Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                  // color: colorAccent,
-                  borderRadius: BorderRadius.circular(30)),
-              child: Text(userName.substring(0, 1),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontFamily: 'OverpassRegular',
-                      fontWeight: FontWeight.w300)),
-            ),
-            const SizedBox(
-              width: 12,
-            ),
-            Text(userName,
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontFamily: 'OverpassRegular',
-                    fontWeight: FontWeight.w300))
-          ],
-        ),
-      ),
     );
   }
+
+  String _relativeTime(DateTime dt) {
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${dt.month}/${dt.day}';
+  }
 }
-
-// class ChatScreen extends StatefulWidget {
-//   const ChatScreen({Key? key}) : super(key: key);
-
-//   @override
-//   State<ChatScreen> createState() => _ChatScreenState();
-// }
-
-// class _ChatScreenState extends State<ChatScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: CustomAppBar(
-//         widget: const Icon(Icons.search,color: Color(0xfffcf9f4),),
-//         leading: Icons.search,
-//         title: 'Message',
-//         onPressed: (){
-//           Navigator.push(
-//               context, MaterialPageRoute(builder: (context) => const ChatSearch()));
-//         },
-
-//         // elevation: ,
-//         // onPressed: (){
-          
-//         // },
-//       ),
-//       body: ListView(
-//         children: [
-//           ListTile(
-//             leading: CircleAvatar(
-//               radius: 25,
-//               backgroundColor: Colors.transparent,
-//               child: Image.asset(
-//                 "assets/images/person1.png",
-//               ),
-//             ),
-//             title: Padding(
-//               padding: const EdgeInsets.symmetric(vertical:8.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: const [
-//                   Text('Anna Shvets',
-//                   style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 18,
-//                   ),),
-//                   Text('16 mins ago'),
-//                 ],
-//               ),
-//             ),
-//             subtitle: Row(
-//               children: const [
-//                 Icon(Icons.done_all_rounded),
-//                 Text('We can meet at 2 PM Monday!',
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 ),),
-//               ],
-//             ),
-//           ),
-//           const Divider(),
-//           ListTile(
-//             leading: CircleAvatar(
-//               radius: 25,
-//               backgroundColor: Colors.transparent,
-//               child: Image.asset(
-//                 "assets/images/person2.png",
-//               ),
-//             ),
-//             title: Padding(
-//               padding: const EdgeInsets.symmetric(vertical:8.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: const [
-//                   Text('Spencer Selover',
-//                   style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 18,
-//                   ),),
-//                   Text('34 mins ago'),
-//                 ],
-//               ),
-//             ),
-//             subtitle: Row(
-//               children: const [
-//                 Icon(Icons.done_all_rounded),
-//                 Text('I want to book the house',
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 ),),
-//               ],
-//             ),
-//           ),
-//           const Divider(),
-//           ListTile(
-//             leading: CircleAvatar(
-//               radius: 25,
-//               backgroundColor: Colors.transparent,
-//               child: Image.asset(
-//                 "assets/images/person3.png",
-//               ),
-//             ),
-//             title: Padding(
-//               padding: const EdgeInsets.symmetric(vertical:8.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: const [
-//                   Text('Yogender Singh',
-//                   style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 18,
-//                   ),),
-//                   Text('1 hour ago'),
-//                 ],
-//               ),
-//             ),
-//             subtitle: Row(
-//               children: const [
-//                 Icon(Icons.done_all_rounded),
-//                 Text("Nice house, but I can't afford",
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 ),),
-//               ],
-//             ),
-//           ),
-//           const Divider(),
-//           ListTile(
-//             leading: CircleAvatar(
-//               radius: 25,
-//               backgroundColor: Colors.transparent,
-//               child: Image.asset(
-//                 "assets/images/person4.png",
-//               ),
-//             ),
-//             title: Padding(
-//               padding: const EdgeInsets.symmetric(vertical:8.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: const [
-//                   Text('Anastasia Ganin',
-//                   style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 18,
-//                   ),),
-//                   Text('4 hours ago'),
-//                 ],
-//               ),
-//             ),
-//             subtitle: Row(
-//               children: const [
-//                 Icon(Icons.done_all_rounded),
-//                 Text('We can meet at 5 PM Tuesday!',
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 ),),
-//               ],
-//             ),
-//           ),
-//           const Divider(),
-//           ListTile(
-//             leading: CircleAvatar(
-//               radius: 25,
-//               backgroundColor: Colors.transparent,
-//               child: Image.asset(
-//                 "assets/images/person5.png",
-//               ),
-//             ),
-//             title: Padding(
-//               padding: const EdgeInsets.symmetric(vertical:8.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: const [
-//                   Text('Harsh Vardhan',
-//                   style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 18,
-//                   ),),
-//                   Text('17 hours ago'),
-//                 ],
-//               ),
-//             ),
-//             subtitle: Row(
-//               children: const [
-//                 Icon(Icons.done_all_rounded),
-//                 Text('Are you free sometime in the...',
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 ),),
-//               ],
-//             ),
-//           ),
-//           const Divider(),
-//           ListTile(
-//             leading: CircleAvatar(
-//               radius: 25,
-//               backgroundColor: Colors.transparent,
-//               child: Image.asset(
-//                 "assets/images/person1.png",
-//               ),
-//             ),
-//             title: Padding(
-//               padding: const EdgeInsets.symmetric(vertical:8.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: const [
-//                   Text('Sinita Leunen',
-//                   style: TextStyle(
-//                     fontWeight: FontWeight.bold,
-//                     fontSize: 18,
-//                   ),),
-//                   Text('Yesterday'),
-//                 ],
-//               ),
-//             ),
-//             subtitle: Row(
-//               children: const [
-//                 Icon(Icons.done_all_rounded),
-//                 Text('We can meet at 2 PM Monday!',
-//                 style: TextStyle(
-//                   fontSize: 15,
-//                 ),),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

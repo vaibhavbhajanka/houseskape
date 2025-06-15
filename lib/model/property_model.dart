@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Property{
+class Property {
   String? id; // Firestore document ID
   DateTime? date;
   String? location;
@@ -8,7 +8,7 @@ class Property{
   String? type;
   int? bedrooms;
   int? bathrooms;
-  String? area; 
+  String? area;
   String? adTitle;
   String? description;
   num? monthlyRent;
@@ -35,10 +35,10 @@ class Property{
     this.ownerName,
   });
 
-  factory Property.fromMap(Map<String, dynamic> map, {String? id}){
+  factory Property.fromMap(Map<String, dynamic> map, {String? id}) {
     return Property(
       id: id,
-      date:(map['date'] as Timestamp).toDate(),
+      date: (map['date'] as Timestamp?)?.toDate(),
       location: map['location'],
       address: map['address'],
       type: map['type'],
@@ -55,23 +55,23 @@ class Property{
     );
   }
 
-  Map<String,dynamic> toMap(){
-    return{
-      'id':id,
-      'date':date,
-      'location':location,
-      'address':address,
-      'type':type,
-      'bedrooms':bedrooms,
-      'bathrooms':bathrooms,
-      'area':area,
-      'adTitle':adTitle,
-      'description':description,
-      'monthlyRent':monthlyRent,
-      'image':image,
-      'owner':owner,
-      'ownerId':ownerId,
-      'ownerName':ownerName,
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'date': date,
+      'location': location,
+      'address': address,
+      'type': type,
+      'bedrooms': bedrooms,
+      'bathrooms': bathrooms,
+      'area': area,
+      'adTitle': adTitle,
+      'description': description,
+      'monthlyRent': monthlyRent,
+      'image': image,
+      'owner': owner,
+      'ownerId': ownerId,
+      'ownerName': ownerName,
     };
   }
 }
