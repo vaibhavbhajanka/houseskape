@@ -419,6 +419,7 @@ class _Step2ScreenState extends State<Step2Screen> {
         owner: loggedInUser.name,
         ownerId: user?.uid,
         ownerName: loggedInUser.name,
+        geo: widget.property.geo,
       );
 
       if (widget.property.id != null) {

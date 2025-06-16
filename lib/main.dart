@@ -14,10 +14,13 @@ import 'package:houseskape/property_details_screen.dart';
 import 'package:houseskape/search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // Initialize Mapbox SDK access token
+  MapboxOptions.setAccessToken(const String.fromEnvironment('ACCESS_TOKEN'));
   // await migratePropertiesToTopLevel();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 

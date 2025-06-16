@@ -41,6 +41,7 @@ class _ListingsScreenState extends State<ListingsScreen> {
         leading: Icons.arrow_back_ios_new_rounded,
         title: 'Listings',
         widget: const SizedBox.shrink(),
+        elevation: 0,
         onPressed: () {
           Navigator.pop(context);
         },

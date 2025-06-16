@@ -28,6 +28,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url 'https://storage.googleapis.com/download.flutter.io' }
+        maven { url 'https://api.mapbox.com/downloads/v2/releases/maven' }
     }
 }
 

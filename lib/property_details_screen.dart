@@ -1,6 +1,5 @@
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
-// import 'package:geocode/geocode.dart';
 import 'package:houseskape/home_icons.dart';
 import 'package:houseskape/notifiers/property_notifier.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
@@ -11,11 +10,10 @@ import 'package:houseskape/repository/chat_repository.dart';
 import 'package:houseskape/chat.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:yandex_mapkit/yandex_mapkit.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' as mapbox;
+import 'package:flutter/services.dart';
 
 bool bookmarked = false;
-// Completer<YandexMapController> _completer = Completer();
-// GeoCode geoCode = GeoCode();
 
 class PropertyDetailsScreen extends StatefulWidget {
   const PropertyDetailsScreen({super.key});
@@ -117,63 +115,33 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
         ),
         elevation: 0,
       ),
-      // appBar: AppBar(
-      //   backgroundColor: Colors.white,
-      //   elevation: 0,
-      //   title: const Text(
-      //     "Details",
-      //     style: TextStyle(
-      //         fontSize: 24,
-      //         fontWeight: FontWeight.w700,
-      //         color: Color(0xff25262B),),
-      //   ),
-      //   centerTitle: true,
-      //   leading: IconButton(
-      //     icon: const Icon(
-      //       Icons.arrow_back_ios,
-      //       color: Color(0xff25262B),
-      //     ),
-      //     onPressed: () {
-      //       Navigator.pop(context);
-      //     },
-      //   ),
-      //   actions: [
-      //     IconButton(
-      //         onPressed: () {
-      //           setState(() {
-      //             bookmarked = !bookmarked;
-      //           });
-      //         },
-      //         icon: bookmarked
-      //             ? const Icon(
-      //                 Icons.bookmark_add_outlined,
-      //                 size: 30,
-      //                 color: Color(0xff25262B),
-      //               )
-      //             : const Icon(
-      //                 Icons.bookmark_added_sharp,
-      //                 size: 30,
-      //                 color: Color(0xff25262B),
-      //               ),)
-      //   ],
-      // ),
-      bottomNavigationBar: Material(
-        elevation: 20,
-        shadowColor: Colors.grey[900],
-        child: BottomAppBar(
-          color: const Color(0xfffcf9f4),
-          shape: const CircularNotchedRectangle(),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.currency_rupee),
-                Text(
-                  "${property.monthlyRent}/month",
-                  style: const TextStyle(fontSize: 20),
-                ),
-              ],
+      bottomNavigationBar: PhysicalModel(
+        color: const Color(0xfffcf9f4),
+        elevation: 12,
+        shadowColor: Colors.grey.shade800,
+        child: SizedBox(
+          height: 56,
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              color: const Color(0xfffdfbf7), // slightly different from scaffold
+              border: Border(
+                top: BorderSide(color: Colors.grey.shade300, width: 1),
+              ),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.currency_rupee, size: 20),
+                  const SizedBox(width: 4),
+                  Text(
+                    "${property.monthlyRent}/month",
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -243,12 +211,12 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                     children: [
                       Icon(HomeIcons.bed,
                           size: 17,
-                          color: const Color(0xff25262B).withOpacity(0.7)),
+                          color: const Color(0xB225262B)),
                       const SizedBox(width: 10),
                       Text("${property.bedrooms} bedrooms",
                           style: TextStyle(
                               fontSize: 14,
-                              color: const Color(0xff25262B).withOpacity(0.7)))
+                              color: const Color(0xB225262B))),
                     ],
                   ),
                   Row(
@@ -256,12 +224,12 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                     children: [
                       Icon(HomeIcons.bathtub,
                           size: 17,
-                          color: const Color(0xff25262B).withOpacity(0.7)),
+                          color: const Color(0xB225262B)),
                       const SizedBox(width: 10),
                       Text("${property.bathrooms} bathrooms",
                           style: TextStyle(
                               fontSize: 14,
-                              color: const Color(0xff25262B).withOpacity(0.7)))
+                              color: const Color(0xB225262B))),
                     ],
                   ),
                   Row(
@@ -269,12 +237,12 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                     children: [
                       Icon(HomeIcons.area,
                           size: 17,
-                          color: const Color(0xff25262B).withOpacity(0.7)),
+                          color: const Color(0xB225262B)),
                       const SizedBox(width: 5),
                       Text("${property.area} sq.ft",
                           style: TextStyle(
                               fontSize: 14,
-                              color: const Color(0xff25262B).withOpacity(0.7)))
+                              color: const Color(0xB225262B))),
                     ],
                   ),
                 ],
@@ -317,66 +285,60 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                         );
                       },
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          property.ownerName ?? property.owner ?? '',
-                          style: const TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xff1B3359)),
-                        ),
-                        Text(
-                          "Landlord",
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff25262B).withOpacity(0.6)),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Material(
-                          child: InkWell(
-                            onTap: () async {
-                              final currentUser =
-                                  FirebaseAuth.instance.currentUser;
-                              final property = propertyArg ??
-                                  propertyNotifier.currentProperty;
-                              final ownerUid = property.ownerId;
-                              if (currentUser == null ||
-                                  ownerUid == null ||
-                                  ownerUid == currentUser.uid) return;
-                              final repo = FirestoreChatRepository();
-                              final roomId = await repo.createOrGetRoom(
-                                  currentUser.uid, ownerUid);
-
-                              // Retrieve owner's display name from users collection
-                              final snap = await FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(ownerUid)
-                                  .get();
-                              final ownerName = snap.data()?['name'] ?? 'User';
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => Chat(
-                                      chatRoomId: roomId,
-                                      otherUserName: ownerName),
-                                ),
-                              );
-                            },
-                            child: const Icon(Icons.message_rounded),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            property.ownerName ?? property.owner ?? '',
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xff1B3359)),
                           ),
-                        ),
-                      ],
-                    )
+                          const SizedBox(height: 4),
+                          Text(
+                            "Property Owner",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0x9925262B)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.message_rounded),
+                      color: const Color(0xff25262b),
+                      onPressed: () async {
+                        final currentUser = FirebaseAuth.instance.currentUser;
+                        final property =
+                            propertyArg ?? propertyNotifier.currentProperty;
+                        final ownerUid = property.ownerId;
+                        if (currentUser == null ||
+                            ownerUid == null ||
+                            ownerUid == currentUser.uid) return;
+                        final repo = FirestoreChatRepository();
+                        final roomId =
+                            await repo.createOrGetRoom(currentUser.uid, ownerUid);
+
+                        final snap = await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(ownerUid)
+                            .get();
+                        final ownerName = snap.data()?['name'] ?? 'User';
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Chat(
+                                chatRoomId: roomId, otherUserName: ownerName),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -395,41 +357,56 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
                   Icon(
                     Icons.location_on_outlined,
                     size: 20,
-                    color: const Color(0xff25262B).withOpacity(0.7),
+                    color: const Color(0xB225262B),
                   ),
                   Expanded(
                     child: Text(property.address.toString(),
                         style: TextStyle(
                             fontSize: 14,
-                            color: const Color(0xff25262B).withOpacity(0.7))),
+                            color: const Color(0xB225262B))),
                   )
                 ],
               ),
               const SizedBox(height: 16),
-              Container(
-                height: 160,
-                decoration: BoxDecoration(
-                  color: const Color(0xffE7E7E7),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  Navigator.pushNamed(context, '/map', arguments: property);
+                },
+                child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.map_outlined,
-                        size: 48,
-                        color: Color(0xff25262B),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Map view coming soon",
-                        style: TextStyle(
-                          color: Color(0xff25262B),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
+                  child: SizedBox(
+                    height: 160,
+                    child: property.lat != null && property.lng != null
+                        ? IgnorePointer(
+                            ignoring: true,
+                            child: mapbox.MapWidget(
+                              key: ValueKey('miniMap'),
+                              cameraOptions: mapbox.CameraOptions(
+                                center: mapbox.Point(coordinates: mapbox.Position(property.lng!, property.lat!)),
+                                zoom: 14.0,
+                              ),
+                              onMapCreated: (mapbox.MapboxMap map) async {
+                                // Disable gestures for mini map
+                                await map.gestures.updateSettings(mapbox.GesturesSettings(
+                                  scrollEnabled: false,
+                                  rotateEnabled: false,
+                                  pinchToZoomEnabled: false,
+                                  pitchEnabled: false,
+                                ));
+
+                                // Add pin icon
+                                final bytes = await rootBundle.load('assets/images/pin.png');
+                                final pin = bytes.buffer.asUint8List();
+                                final manager = await map.annotations.createPointAnnotationManager();
+                                await manager.create(mapbox.PointAnnotationOptions(
+                                  geometry: mapbox.Point(coordinates: mapbox.Position(property.lng!, property.lat!)),
+                                  image: pin,
+                                  iconSize: 1.2,
+                                ));
+                              },
+                            ))
+                        : Container(color: const Color(0xffE7E7E7)),
                   ),
                 ),
               ),
@@ -454,21 +431,4 @@ class _PropertyDetailsScreenState extends State<PropertyDetailsScreen> {
       ),
     );
   }
-
-  // void onMapCreated(YandexMapController controller) {
-  //   _completer.complete(controller);
-  //   controller.getScreenPoint(Point(
-  //       longitude: getLatitude("85, E block, Thomas Ave, Brooklyn"),
-  //       latitude: getLongitude("85, E block, Thomas Ave, Brooklyn")));
-  // }
-
-  // getLatitude(String address) async {
-  //   Coordinates coordinates = await geoCode.forwardGeocoding(address: address);
-  //   return coordinates.latitude;
-  // }
-
-  // getLongitude(String address) async {
-  //   Coordinates coordinates = await geoCode.forwardGeocoding(address: address);
-  //   return coordinates.longitude;
-  // }
 }

@@ -46,6 +46,9 @@ dependencies:
   flutter_plugin_android_lifecycle: ^2.0.28
   cached_network_image: ^3.4.1
   shimmer: ^3.0.0
+  mapbox_maps_flutter: ^2.8.0
+  http: ^1.2.0
+  permission_handler: ^11.3.0
 
   path: any
 dev_dependencies:

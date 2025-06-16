@@ -20,14 +20,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: CustomAppBar(
         leading: HomeIcons.menu,
-        widget: GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(context, '/search');
-          },
-          child: Icon(
-            Icons.search,
-            color: Color(0xff25262b),
-          ),
+        widget: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/search');
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(
+                  Icons.search,
+                  color: Color(0xff25262b),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/map');
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(
+                  Icons.map_outlined,
+                  color: Color(0xff25262b),
+                ),
+              ),
+            ),
+          ],
         ),
         elevation: 0,
         title: 'Home',

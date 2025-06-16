@@ -16,6 +16,10 @@ class Property {
   String? owner;
   String? ownerId; // UID of the owner
   String? ownerName; // Display name of the owner
+  GeoPoint? geo;
+
+  double? get lat => geo?.latitude;
+  double? get lng => geo?.longitude;
 
   Property({
     this.id,
@@ -33,6 +37,7 @@ class Property {
     this.owner,
     this.ownerId,
     this.ownerName,
+    this.geo,
   });
 
   factory Property.fromMap(Map<String, dynamic> map, {String? id}) {
@@ -52,6 +57,7 @@ class Property {
       owner: map['owner'],
       ownerId: map['ownerId'],
       ownerName: map['ownerName'],
+      geo: map['geo'] as GeoPoint?,
     );
   }
 
@@ -72,6 +78,7 @@ class Property {
       'owner': owner,
       'ownerId': ownerId,
       'ownerName': ownerName,
+      'geo': geo,
     };
   }
 }

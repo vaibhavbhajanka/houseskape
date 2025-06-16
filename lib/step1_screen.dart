@@ -3,6 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:houseskape/model/property_model.dart';
 import 'package:houseskape/step2_screen.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
+import 'package:houseskape/widgets/address_autocomplete_field.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Step1Screen extends StatefulWidget {
   final Property? property;
@@ -27,6 +29,7 @@ class _Step1ScreenState extends State<Step1Screen> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController rentController = TextEditingController();
   final TextEditingController areaController = TextEditingController();
+  GeoPoint? _geo;
 
   bool isFormValid = false;
 
@@ -75,7 +78,8 @@ class _Step1ScreenState extends State<Step1Screen> {
         selectedBathroomNumber != null &&
         selectedBathroomNumber != 0 &&
         areaController.text.isNotEmpty &&
-        addressController.text.isNotEmpty;
+        addressController.text.isNotEmpty &&
+        _geo != null;
     if (isFormValid != valid) {
       setState(() {
         isFormValid = valid;
@@ -116,28 +120,13 @@ class _Step1ScreenState extends State<Step1Screen> {
     );
 
     // Address field with helper text
-    final addressField = TextFormField(
+    final addressField = AddressAutocompleteField(
       controller: addressController,
-      keyboardType: TextInputType.multiline,
-      maxLines: null,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return "Address cannot be empty";
-        }
-        return null;
+      googleApiKey: const String.fromEnvironment('GOOGLE_API_KEY'),
+      onSelected: (suggestion) {
+        _geo = GeoPoint(suggestion.lat, suggestion.lng);
+        _updateFormValid();
       },
-      decoration: InputDecoration(
-        labelText: 'Street Address',
-        hintText: 'e.g., 123 Main St, Near Park',
-        helperText: 'Enter the full address of the property',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Color(0xFF1B3359), width: 2),
-        ),
-        errorStyle:
-            const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-      ),
     );
 
     // Area field with helper text
@@ -474,6 +463,7 @@ class _Step1ScreenState extends State<Step1Screen> {
                                 owner: widget.property?.owner,
                                 ownerId: widget.property?.ownerId,
                                 ownerName: widget.property?.ownerName,
+                                geo: _geo,
                               );
                               Navigator.push(
                                 context,
