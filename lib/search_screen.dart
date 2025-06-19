@@ -1,11 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart'; // Not used after refactor
+// import 'package:provider/provider.dart'; // Not used after refactor
+// import 'package:houseskape/notifiers/property_notifier.dart';
 import 'package:flutter/material.dart';
-import 'package:houseskape/api/property_api.dart';
 import 'package:houseskape/model/property_model.dart';
-import 'package:houseskape/notifiers/property_notifier.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:houseskape/widgets/property_card.dart';
+import 'package:houseskape/model/search_query.dart';
+import 'package:houseskape/repository/property_search_repository.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -15,103 +16,92 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<String> items = ["Gangtok", "Majitar", "Rangpo", "Singtam"];
-  String? selecteditem = "Gangtok";
-
-  User? user = FirebaseAuth.instance.currentUser;
-
-  Property property = Property();
-
-  @override
-  void initState() {
-    PropertyNotifier propertyNotifier =
-        Provider.of<PropertyNotifier>(context, listen: false);
-    getAllProperties(propertyNotifier, selecteditem.toString());
-    super.initState();
-  }
+  final List<String> _locations = ["Gangtok", "Majitar", "Rangpo", "Singtam"];
+  String _selectedLocation = "Gangtok";
+  final _searchRepo = PropertySearchRepository();
 
   @override
   Widget build(BuildContext context) {
-    PropertyNotifier propertyNotifier = Provider.of<PropertyNotifier>(context);
-    Future<void> refreshList() async {
-      getAllProperties(propertyNotifier, selecteditem.toString());
-    }
+    final query = SearchQuery(location: _selectedLocation);
 
     return Scaffold(
       appBar: CustomAppBar(
         leading: Icons.arrow_back_ios_new_rounded,
-        title: 'Search',
+        title: 'Discover',
         widget: const SizedBox.shrink(),
         elevation: 0,
-        onPressed: () {
-          Navigator.pop(context);
-        },
+        onPressed: () => Navigator.pop(context),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelStyle: Theme.of(context).textTheme.bodyMedium,
-                  labelText: ' Location ',
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(width: 1, color: Colors.black),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(color: Colors.black, width: 1),
-                  ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelStyle: Theme.of(context).textTheme.bodyMedium,
+                labelText: ' Location ',
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(width: 1, color: Colors.black),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                value: selecteditem,
-                items: items
-                    .map(
-                      (item) => DropdownMenuItem<String>(
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(color: Colors.black, width: 1),
+                ),
+              ),
+              value: _selectedLocation,
+              items: _locations
+                  .map((item) => DropdownMenuItem<String>(
                         value: item,
                         child: Text(item),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (item) => setState(() {
-                  selecteditem = item;
-                  getAllProperties(propertyNotifier, selecteditem.toString());
-                }),
-              ),
+                      ))
+                  .toList(),
+              onChanged: (item) {
+                if (item == null) return;
+                setState(() => _selectedLocation = item);
+              },
             ),
-            RefreshIndicator(
-              onRefresh: refreshList,
-              child: propertyNotifier.allPropertyList.isEmpty
-                  ? const _PlaceholderView(
-                      icon: Icons.search_off,
-                      title: 'No results',
-                      subtitle: 'Try another location')
-                  : ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: propertyNotifier.allPropertyList.length,
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const SizedBox(
-                          height: 10,
+          ),
+          Expanded(
+            child: StreamBuilder<List<Property>>(
+              stream: _searchRepo.watchProperties(query),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final properties = snapshot.data ?? [];
+
+                if (properties.isEmpty) {
+                  return const _PlaceholderView(
+                    icon: Icons.search_off,
+                    title: 'No results',
+                    subtitle: 'Try another location',
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  itemCount: properties.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final property = properties[index];
+                    return PropertyCard(
+                      property: property,
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/property-details',
+                          arguments: property,
                         );
                       },
-                      itemBuilder: (BuildContext context, int index) {
-                        return PropertyCard(
-                          property: propertyNotifier.allPropertyList[index],
-                          onTap: () {
-                            propertyNotifier.currentProperty =
-                                propertyNotifier.allPropertyList[index];
-                            Navigator.pushNamed(context, '/property-details');
-                          },
-                        );
-                      },
-                    ),
+                    );
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

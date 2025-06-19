@@ -58,17 +58,31 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  flutter_native_splash: ^2.1.1
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.2
   flutter_test:
     sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_launcher_icons:
+  ios: true
+  image_path: assets/images/app_icon.png
+  adaptive_icon_background: "#fcf9f4"                # or image path
+  remove_alpha_ios: true
+  background_color_ios: "#fcf9f4"
+
 flutter_native_splash:
   color: "#fcf9f4"
   image: assets/images/logo3x.png
-  android: true
   ios: true
+  android: true
+
+  android_12:
+    image: assets/images/android_splash.png      # <-- the logo you WANT to see
+    icon_background_color: "#fcf9f4"     # keeps circle/shape consistent
+    color: "#fcf9f4" 
 
 # The following section is specific to Flutter.
 flutter:

@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, '/search');
+                Navigator.pushNamed(context, '/map');
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -34,29 +34,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/map');
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Icon(
-                  Icons.map_outlined,
-                  color: Color(0xff25262b),
-                ),
-              ),
-            ),
           ],
         ),
         elevation: 0,
-        title: 'Home',
+        title: '',
         onPressed: () {},
       ),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('properties').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return const _PlaceholderView(
@@ -70,19 +58,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'Nothing here',
                 subtitle: 'No properties found');
           }
+
           final properties = snapshot.data!.docs
               .map((doc) => Property.fromMap(doc.data(), id: doc.id))
               .toList();
+
           return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-            itemCount: properties.length,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            itemCount: properties.length + 1,
             itemBuilder: (context, index) {
-              final property = properties[index];
+              if (index == 0) {
+                // Header – two-line hero text.
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Find your',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w300,
+                              color: const Color(0xFF25262B),
+                            )),
+                    const SizedBox(height: 4),
+                    Text('best property',
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF25262B),
+                            )),
+                    const SizedBox(height: 16),
+                  ],
+                );
+              }
+
+              final property = properties[index - 1];
               return PropertyCard(
                 property: property,
                 onTap: () {
-                  Navigator.pushNamed(context, '/property-details',
-                      arguments: property);
+                  Navigator.pushNamed(context, '/property-details', arguments: property);
                 },
               );
             },

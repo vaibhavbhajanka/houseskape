@@ -5,6 +5,7 @@ import 'package:houseskape/step2_screen.dart';
 import 'package:houseskape/widgets/custom_app_bar.dart';
 import 'package:houseskape/widgets/address_autocomplete_field.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:houseskape/constants/property_types.dart';
 
 class Step1Screen extends StatefulWidget {
   final Property? property;
@@ -23,8 +24,8 @@ class _Step1ScreenState extends State<Step1Screen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  int _indexSelected = 0;
-  String? selectedType = '';
+  int _indexSelected = -1;
+  String? selectedType;
 
   final TextEditingController addressController = TextEditingController();
   final TextEditingController rentController = TextEditingController();
@@ -44,23 +45,8 @@ class _Step1ScreenState extends State<Step1Screen> {
       areaController.text = widget.property!.area ?? '';
       selectedBedroomNumber = widget.property!.bedrooms ?? 1;
       selectedBathroomNumber = widget.property!.bathrooms ?? 1;
-      // Set property type chip index
-      switch (selectedType) {
-        case 'Studio':
-          _indexSelected = 0;
-          break;
-        case 'Convertible Studio':
-          _indexSelected = 1;
-          break;
-        case 'Garden Apartment':
-          _indexSelected = 2;
-          break;
-        case 'Duplex':
-          _indexSelected = 3;
-          break;
-        default:
-          _indexSelected = -1;
-      }
+      // Set chip index from list
+      _indexSelected = kPropertyTypes.indexOf(selectedType ?? '');
     }
     addressController.addListener(_updateFormValid);
     areaController.addListener(_updateFormValid);
@@ -318,80 +304,25 @@ class _Step1ScreenState extends State<Step1Screen> {
                           child: Center(
                             child: Wrap(
                               spacing: 15,
-                              children: [
-                                ChoiceChip(
-                                  label: const Text('Studio'),
-                                  selected: _indexSelected == 0,
+                              children: List<Widget>.generate(kPropertyTypes.length, (i) {
+                                final type = kPropertyTypes[i];
+                                return ChoiceChip(
+                                  label: Text(type),
+                                  selected: _indexSelected == i,
                                   onSelected: (value) {
                                     setState(() {
-                                      _indexSelected = value ? 0 : -1;
-                                      selectedType = 'Studio';
+                                      _indexSelected = value ? i : -1;
+                                      selectedType = value ? type : null;
                                     });
                                     _updateFormValid();
                                   },
                                   selectedColor: const Color(0xFF1B3359),
                                   labelStyle: TextStyle(
-                                    color: _indexSelected == 0
-                                        ? Colors.white
-                                        : Colors.black,
+                                    color: _indexSelected == i ? Colors.white : Colors.black,
                                   ),
                                   backgroundColor: Colors.grey[200],
-                                ),
-                                ChoiceChip(
-                                  label: const Text('Convertible Studio'),
-                                  selected: _indexSelected == 1,
-                                  onSelected: (value) {
-                                    setState(() {
-                                      _indexSelected = value ? 1 : -1;
-                                      selectedType = 'Convertible Studio';
-                                    });
-                                    _updateFormValid();
-                                  },
-                                  selectedColor: const Color(0xFF1B3359),
-                                  labelStyle: TextStyle(
-                                    color: _indexSelected == 1
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  backgroundColor: Colors.grey[200],
-                                ),
-                                ChoiceChip(
-                                  label: const Text('Garden Apartment'),
-                                  selected: _indexSelected == 2,
-                                  onSelected: (value) {
-                                    setState(() {
-                                      _indexSelected = value ? 2 : -1;
-                                      selectedType = 'Garden Apartment';
-                                    });
-                                    _updateFormValid();
-                                  },
-                                  selectedColor: const Color(0xFF1B3359),
-                                  labelStyle: TextStyle(
-                                    color: _indexSelected == 2
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  backgroundColor: Colors.grey[200],
-                                ),
-                                ChoiceChip(
-                                  label: const Text('Duplex'),
-                                  selected: _indexSelected == 3,
-                                  onSelected: (value) {
-                                    setState(() {
-                                      _indexSelected = value ? 3 : -1;
-                                      selectedType = 'Duplex';
-                                    });
-                                    _updateFormValid();
-                                  },
-                                  selectedColor: const Color(0xFF1B3359),
-                                  labelStyle: TextStyle(
-                                    color: _indexSelected == 3
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                  backgroundColor: Colors.grey[200],
-                                ),
-                              ],
+                                );
+                              }),
                             ),
                           ),
                         ),
