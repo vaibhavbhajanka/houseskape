@@ -1,14 +1,70 @@
-# 🏠 Houseskape
+# 🏠 HouseSkape
 
-A modern, mobile-first real-estate marketplace built with **Flutter**.  Houseskape lets you discover rental properties on an interactive map, chat with owners / agents in real-time and manage your saved listings – all from a single, beautiful app.
+<div align="center">
 
-![Houseskape hero](assets/images/logo.png)
+[![](https://img.shields.io/badge/Built_with-Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)]()
+[![](https://img.shields.io/badge/Backend-Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)]()
+[![](https://img.shields.io/badge/Maps-Mapbox-000000?style=for-the-badge&logo=mapbox)]()
+[![](https://img.shields.io/badge/Places_API-Google-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white)]()
+[![](https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)]()
+[![](https://img.shields.io/badge/Platform-iOS-000000?style=for-the-badge&logo=apple&logoColor=white)]()
+
+
+</div>
+
+<p align="center">
+  <a href="https://youtu.be/saAhfmZwnP4">Watch&nbsp;Demo</a> •
+  <a href="https://github.com/vaibhavbhajanka/houseskape/issues">Report&nbsp;Bug</a> •
+  <a href="https://github.com/vaibhavbhajanka/houseskape/issues">Request&nbsp;Feature</a> •
+  <a href="#license">License</a>
+</p>
 
 ---
 
-## ✨ Features
+<details open="open">
+<summary>Table of Contents</summary>
 
-- 🔍 **Search & Filters** – Search by city, rent range, bedrooms/bathrooms and property type.
+- [About](#about)
+- [Quick Demo](#quick-demo)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+
+
+- [Contributing](#contributing)
+
+</details>
+
+## About
+
+A modern, mobile-first real-estate marketplace built with **Flutter**. HouseSkape lets you discover rental properties on an interactive map, chat with owners / agents in real-time and manage your saved listings – all from a single, beautiful app.
+
+![Houseskape hero](assets/images/logo.png)
+
+## Quick Demo
+
+| Feature | Preview |
+|---------|---------|
+| Smart search with instant map results | ![](demo/Map.gif) |
+| Real-time chat between tenant & owner | ![](demo/Chat.gif) |
+| 2-step listing form with validation | ![](demo/Area.gif) |
+
+### Screenshots
+
+| Login | Home | Property Details |
+|-------|------|------------------|
+| ![](demo/Login.png) | ![](demo/Home.png) | ![](demo/Detail.png) |
+
+| Messages | Map View | Profile |
+|----------|----------|---------|
+| ![](demo/Messages.png) | ![](demo/Map.png) | ![](demo/Profile.png) |
+
+---
+
+## Features
+
+- 🔍 **Search & Filters** – Search by city, bedrooms/bathrooms and property type.
 - 🗺️ **Interactive Map** – View available listings on a Mapbox powered map with carousel preview.
 - 📄 **Property Details** – View high-quality photos, property specifications, and contact information for each listing.
 - 💬 **In-app Chat** – Real-time messaging between tenants and property owners (Firestore backed).
@@ -18,7 +74,7 @@ A modern, mobile-first real-estate marketplace built with **Flutter**.  Houseska
 
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 | Layer            | Tech                                                         |
 |------------------|--------------------------------------------------------------|
@@ -31,11 +87,11 @@ A modern, mobile-first real-estate marketplace built with **Flutter**.  Houseska
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Clone the repo**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/houseskape.git
+    git clone https://github.com/vaibhavbhajanka/houseskape.git
     cd houseskape
     ```
 2. **Install dependencies**
@@ -57,11 +113,9 @@ A modern, mobile-first real-estate marketplace built with **Flutter**.  Houseska
        --dart-define=MAPBOX_ACCESS_TOKEN=YOUR_MAPBOX_KEY
      ```
 
----
+## High-Level Design
 
-## 🗺️ High-Level Design
-
-Houseskape follows a *thin-client / BaaS* philosophy.  The Flutter app handles presentation & local state, while Firebase provides real-time data sync, auth and storage.
+HouseSkape follows a *thin-client / BaaS* philosophy.  The Flutter app handles presentation & local state, while Firebase provides real-time data sync, auth and storage.
 
 ```mermaid
 flowchart TD
@@ -74,16 +128,15 @@ flowchart TD
     Repo -->|"Realtime Streams"| Firestore["Cloud Firestore"]
     Repo --> Storage["Firebase Storage"]
     Repo --> FCM["Firebase Cloud Messaging"]
-    Repo --> Mapbox["Mapbox Tiles &amp; Directions"]
+    Repo --> Mapbox["Mapbox Tiles & Directions"]
     Repo --> GPlaces["Google Places API"]
 ```
 
-
 ---
 
-## 🤝 Contributing
+## Contributing
 
-Pull requests are welcome!  If you have an idea for a feature or found a bug:
+Pull requests are welcome! If you have an idea for a feature or found a bug:
 
 1. Open an issue describing it.
 2. Fork the repo and create your branch: `git checkout -b feature/my-awesome-feature`.
@@ -94,10 +147,4 @@ Please run `dart format` and make sure `flutter analyze` passes before submittin
 
 ---
 
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-<p align="center">Made with ❤️ &nbsp;by the Houseskape team</p>
+<p align="center">Made with ❤️ &nbsp;by the HouseSkape team</p>

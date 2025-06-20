@@ -61,40 +61,87 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
     _focusNode.dispose();
     super.dispose();
   }
+void _onChanged() {
+  if (!_focusNode.hasFocus) return;
 
-  void _onChanged() {
-    if (_ignoreNextChange) {
-      _ignoreNextChange = false;
-      return;
-    }
-
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () async {
-      List<AddressSuggestion> list = [];
-      try {
-        final query = widget.controller.text.trim();
-        if (query.length < 3) {
-          setState(() => _suggestions = []);
-          _removeOverlay();
-          return;
-        }
-        final preds = await _repo.autocomplete(query, limit: 5);
-        list = preds.map((p) {
-          return AddressSuggestion(
-            title: p.description,
-            subtitle: '',
-            lat: 0.0,
-            lng: 0.0,
-            placeId: p.placeId,
-          );
-        }).toList();
-      } catch (_) {}
-
-      if (!mounted) return;
-      setState(() => _suggestions = list);
-      _showOverlay();
-    });
+  if (_ignoreNextChange) {
+    _ignoreNextChange = false;
+    return;
   }
+
+  final query = widget.controller.text.trim();
+
+  // If the dropdown is already showing the same suggestions as current input, skip re-trigger
+  if (_suggestions.isNotEmpty && _suggestions.first.title == query) {
+    return;
+  }
+
+  if (_debounce?.isActive ?? false) _debounce!.cancel();
+  _debounce = Timer(const Duration(milliseconds: 300), () async {
+    List<AddressSuggestion> list = [];
+    try {
+      if (query.length < 3) {
+        setState(() => _suggestions = []);
+        _removeOverlay();
+        return;
+      }
+      final preds = await _repo.autocomplete(query, limit: 5);
+      list = preds.map((p) {
+        return AddressSuggestion(
+          title: p.description,
+          subtitle: '',
+          lat: 0.0,
+          lng: 0.0,
+          placeId: p.placeId,
+        );
+      }).toList();
+    } catch (_) {}
+
+    if (!mounted) return;
+    setState(() => _suggestions = list);
+    _showOverlay();
+  });
+}
+
+  // void _onChanged() {
+  //   // Only trigger autocomplete while the field is actively focused. If we
+  //   // programmatically change the text after a user selection (and unfocus the
+  //   // field), this prevents a second dropdown that only mirrors the current
+  //   // text from re-appearing.
+  //   if (!_focusNode.hasFocus) return;
+
+  //   if (_ignoreNextChange) {
+  //     _ignoreNextChange = false;
+  //     return;
+  //   }
+
+  //   if (_debounce?.isActive ?? false) _debounce!.cancel();
+  //   _debounce = Timer(const Duration(milliseconds: 300), () async {
+  //     List<AddressSuggestion> list = [];
+  //     try {
+  //       final query = widget.controller.text.trim();
+  //       if (query.length < 3) {
+  //         setState(() => _suggestions = []);
+  //         _removeOverlay();
+  //         return;
+  //       }
+  //       final preds = await _repo.autocomplete(query, limit: 5);
+  //       list = preds.map((p) {
+  //         return AddressSuggestion(
+  //           title: p.description,
+  //           subtitle: '',
+  //           lat: 0.0,
+  //           lng: 0.0,
+  //           placeId: p.placeId,
+  //         );
+  //       }).toList();
+  //     } catch (_) {}
+
+  //     if (!mounted) return;
+  //     setState(() => _suggestions = list);
+  //     _showOverlay();
+  //   });
+  // }
 
   void _showOverlay() {
     _removeOverlay();
@@ -149,6 +196,9 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                           );
                         } catch (_) {}
                       }
+
+                      // Unfocus the text field to dismiss the keyboard and ensure the overlay closes
+                      _focusNode.unfocus();
 
                       widget.onSelected(selected);
                       setState(() => _suggestions = []);

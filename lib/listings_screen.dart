@@ -57,74 +57,76 @@ class _ListingsScreenState extends State<ListingsScreen> {
           },
           itemBuilder: (BuildContext context, int index) {
             final property = propertyNotifier.propertyList[index];
-            return Stack(
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    propertyNotifier.currentProperty = property;
-                    Navigator.pushNamed(context, '/property-details');
-                  },
-                  child: SizedBox(
-                    height: 160,
-                    child: PropertyCard(
-                      property: property,
-                      onTap: () {
-                        propertyNotifier.currentProperty = property;
-                        Navigator.pushNamed(context, '/property-details');
-                      },
+                // Property card occupies remaining width
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      propertyNotifier.currentProperty = property;
+                      Navigator.pushNamed(context, '/property-details');
+                    },
+                    child: SizedBox(
+                      height: 160,
+                      child: PropertyCard(
+                        property: property,
+                        onTap: () {
+                          propertyNotifier.currentProperty = property;
+                          Navigator.pushNamed(context, '/property-details');
+                        },
+                      ),
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 8,
-                  right: 48,
-                  child: IconButton(
-                    icon: Icon(Icons.edit, color: Colors.blue),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Step1Screen(property: property),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('Delete Listing'),
-                          content: Text(
-                              'Are you sure you want to delete this property?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel',
-                                  style: TextStyle(color: Color(0xff25262b))),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: Text('Delete',
-                                  style: TextStyle(color: Colors.red)),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (confirm == true && property.id != null) {
-                        await FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(property.id)
-                            .delete();
-                        refreshList();
-                      }
-                    },
-                  ),
+                // Action buttons
+                Column(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Edit',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Step1Screen(property: property),
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Delete',
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete Listing'),
+                            content: const Text('Are you sure you want to delete this property?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel', style: TextStyle(color: Color(0xff25262b))),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true && property.id != null) {
+                          await FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(property.id)
+                              .delete();
+                          refreshList();
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             );

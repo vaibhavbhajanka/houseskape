@@ -45,6 +45,7 @@ Future<void> main() async {
     }
   });
   runApp(
+    
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -62,6 +63,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           fontFamily: 'DM_Sans',
           scaffoldBackgroundColor: const Color(0xfffcf9f4),
